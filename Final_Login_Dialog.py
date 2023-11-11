@@ -1,10 +1,12 @@
 import customtkinter as ctk
 import pymysql
 
-class login_window(ctk.CTk):
+global connection
+connection = None
+
+class login_window(ctk.CTkToplevel):
     def __init__(self, width, height):
         super().__init__()
-
         center_x = int((self.winfo_screenwidth() - width) / 2)
         center_y = int((self.winfo_screenheight() - height) / 2)
 
@@ -125,7 +127,7 @@ class frame(ctk.CTkFrame):
         user = self.username_var.get()
         pwd = self.pwd_var.get()
         database = 'empproject'
-        connection = None
+        global connection
         try:
             connection = pymysql.connect(host=host, user=user, password=pwd, database=database)
         except pymysql.err.OperationalError:
@@ -143,7 +145,11 @@ class frame(ctk.CTkFrame):
 
         return connection
         
-
 home = login_window(400, 300)
-
 home.mainloop()
+
+def send_connection():
+    global connection
+    return connection
+
+

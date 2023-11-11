@@ -1,12 +1,6 @@
 import customtkinter as ctk
 import pymysql
 
-# connection = None
-# def send_connection():
-#     global connection
-#     connection = frame(None).establish_connection()
-#     return connection
-
 class login_window(ctk.CTk):
     def __init__(self, width, height):
         super().__init__()
@@ -32,15 +26,19 @@ class canva(ctk.CTkCanvas):
         super().__init__(parent, highlightthickness = 0, bg = 'black')
         self.pack(expand=True, fill='both')
         self.center_frame = frame(self)
-        self.center_frame.place(relx = 0.5, rely=0.5, anchor='center')
+        self.center_frame.place(relx = 0.5, rely=0.5, anchor='center', relwidth=1, relheight=1)
 
 
 class frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color="transparent", border_color="cyan", border_width=1,  height= 300, width= 300)
 
-        #1 Login Label
+        # Login Label
         login_label = ctk.CTkLabel(self, text="Login", font=("Helvetica", 20, "bold"), text_color="white") 
+
+        # Username/Password labels
+        username_label = ctk.CTkLabel(self, text='Username', text_color='white', font=("Helvetica", 14))
+        pwd_label = ctk.CTkLabel(self, text='Password', text_color='white', font=("Helvetica", 14))
 
         # Entry widgets
         self.username_var = ctk.StringVar()
@@ -61,8 +59,8 @@ class frame(ctk.CTkFrame):
                                        show="🖕🏻", 
                                        textvariable=self.pwd_var)
         
-        self.user_entry_rel_width = 0.7
-        self.pwd_entry_rel_width = 0.7
+        self.user_entry_rel_width = 0.4
+        self.pwd_entry_rel_width = 0.4
         
         self.username_entry.bind('<FocusIn>', self.animate_user_entry)
         self.username_entry.bind('<FocusOut>', self.deanimate_user_entry)
@@ -84,8 +82,13 @@ class frame(ctk.CTkFrame):
 
         # Placing Widgets
         login_label.place(relx=0.5, rely=0.1, anchor='center')
-        self.username_entry.place(relx=0.5, rely=0.4,relheight = 0.1, relwidth=self.user_entry_rel_width, anchor='center')
-        self.pswd_entry.place(relx=0.5, rely=0.6,relheight = 0.1, relwidth=self.pwd_entry_rel_width, anchor='center')
+
+        username_label.place(relx=0.30, rely=0.395, anchor='center')
+        pwd_label.place(relx=0.30, rely=0.595, anchor='center')
+
+        self.username_entry.place(relx=0.65, rely=0.4,relheight = 0.1, relwidth=self.user_entry_rel_width, anchor='center')
+        self.pswd_entry.place(relx=0.65, rely=0.6,relheight = 0.1, relwidth=self.pwd_entry_rel_width, anchor='center')
+
         submit.place(relx=0.5, rely=0.85, anchor='center', relwidth=0.4)
 
         self.error.place(relx= 0.5, rely=0.77, anchor='s')
@@ -93,34 +96,28 @@ class frame(ctk.CTkFrame):
         self.username_entry.bind('<Return>', lambda e: self.establish_connection())
         self.pswd_entry.bind('<Return>', lambda e: self.establish_connection())
 
-        # self.focus_out()
-
-    # def focus_out(self):
-    #     home.bind('<Button-1>', self.deanimate_pwd_entry)
-    #     home.bind('<Button-1>', self.deanimate_user_entry)
-
     def animate_user_entry(self, event):
         self.user_entry_rel_width += 0.016
-        if self.user_entry_rel_width <= 0.9:
-            self.username_entry.place(relx=0.5, rely=0.4, relheight = 0.1, relwidth=self.user_entry_rel_width, anchor='center')
+        if self.user_entry_rel_width <= 0.5:
+            self.username_entry.place(relx=0.65, rely=0.4, relheight = 0.1, relwidth=self.user_entry_rel_width, anchor='center')
             home.after(1, lambda: self.animate_user_entry(event))
    
     def deanimate_user_entry(self, event):
         self.user_entry_rel_width -= 0.016
-        if self.user_entry_rel_width >= 0.7:
-            self.username_entry.place(relx=0.5, rely=0.4, relheight = 0.1, relwidth=self.user_entry_rel_width, anchor='center')
+        if self.user_entry_rel_width >= 0.4:
+            self.username_entry.place(relx=0.65, rely=0.4, relheight = 0.1, relwidth=self.user_entry_rel_width, anchor='center')
             home.after(1, lambda: self.deanimate_user_entry(event))
 
     def animate_pwd_entry(self, event):
         self.pwd_entry_rel_width += 0.016
-        if self.pwd_entry_rel_width <= 0.9:
-            self.pswd_entry.place(relx=0.5, rely=0.6, relheight = 0.1, relwidth=self.pwd_entry_rel_width, anchor='center')
+        if self.pwd_entry_rel_width <= 0.5:
+            self.pswd_entry.place(relx=0.65, rely=0.6, relheight = 0.1, relwidth=self.pwd_entry_rel_width, anchor='center')
             home.after(1, lambda: self.animate_pwd_entry(event))
    
     def deanimate_pwd_entry(self, event):
         self.pwd_entry_rel_width -= 0.016
-        if self.pwd_entry_rel_width >= 0.7:
-            self.pswd_entry.place(relx=0.5, rely=0.6, relheight = 0.1, relwidth=self.pwd_entry_rel_width, anchor='center')
+        if self.pwd_entry_rel_width >= 0.4:
+            self.pswd_entry.place(relx=0.65, rely=0.6, relheight = 0.1, relwidth=self.pwd_entry_rel_width, anchor='center')
             home.after(1, lambda: self.deanimate_pwd_entry(event))
 
     def establish_connection(self):
@@ -147,7 +144,7 @@ class frame(ctk.CTkFrame):
         return connection
         
 
-home = login_window(300, 300)
+home = login_window(400, 300)
 
 # connection = frame(None).establish_connection()
 # cursor = connection.cursor()

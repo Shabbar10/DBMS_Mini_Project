@@ -146,7 +146,4 @@ class frame(ctk.CTkFrame):
 
 home = login_window(400, 300)
 
-# connection = frame(None).establish_connection()
-# cursor = connection.cursor()
-
 home.mainloop()

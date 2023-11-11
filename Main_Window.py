@@ -16,10 +16,10 @@ class App(ctk.CTkToplevel):
 
         print(f'\n\nThe user is {user}\n\n')
 
-        if user == 'boom':
+        if user == 'root':
             left_frame = Left_Admin_Frame(self)
             right_frame = Right_Admin_Frame(self)
-        else:
+        elif user == 'guest':
             left_frame = Left_User_Frame(self)
             right_frame = Right_User_Frame(self)
 
@@ -84,6 +84,7 @@ class Right_Frame(ctk.CTkFrame):
         self.view_button.grid(column=0, row=1, sticky='ew', padx=80, ipady=25, ipadx=2)
         self.delete_button.grid(column=0, row=2, sticky='ew', padx=80, ipady=25, ipadx=2)
         self.update_button.grid(column=0, row=3, sticky='ew', padx=80, ipady=25, ipadx=2)
+
 
 class Right_User_Frame(Right_Frame):
     def __init__(self, parent):

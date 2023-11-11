@@ -1,6 +1,12 @@
 import customtkinter as ctk
 import pymysql
 
+# connection = None
+# def send_connection():
+#     global connection
+#     connection = frame(None).establish_connection()
+#     return connection
+
 class login_window(ctk.CTk):
     def __init__(self, width, height):
         super().__init__()
@@ -13,15 +19,20 @@ class login_window(ctk.CTk):
         self.overrideredirect(True)
         self.attributes('-topmost', True)
 
-        self.bind('<Return>', frame(None).establish_connection)
         self.bind('<Escape>', lambda e: self.destroy())
+        self.bind('<Button-1>', lambda e: self.deanimate_all(e))
+    
+    def deanimate_all(self, event):
+        self.main_container.center_frame.deanimate_user_entry(event)
+        self.main_container.center_frame.deanimate_pwd_entry(event)
 
 
 class canva(ctk.CTkCanvas):
     def __init__(self, parent):
         super().__init__(parent, highlightthickness = 0, bg = 'black')
         self.pack(expand=True, fill='both')
-        self.center_frame = frame(self).place(relx = 0.5, rely=0.5, anchor='center')
+        self.center_frame = frame(self)
+        self.center_frame.place(relx = 0.5, rely=0.5, anchor='center')
 
 
 class frame(ctk.CTkFrame):
@@ -78,7 +89,15 @@ class frame(ctk.CTkFrame):
         submit.place(relx=0.5, rely=0.85, anchor='center', relwidth=0.4)
 
         self.error.place(relx= 0.5, rely=0.77, anchor='s')
-        # pswd_error.place(relx= 0.7, rely=0.5, anchor='center')
+
+        self.username_entry.bind('<Return>', lambda e: self.establish_connection())
+        self.pswd_entry.bind('<Return>', lambda e: self.establish_connection())
+
+        # self.focus_out()
+
+    # def focus_out(self):
+    #     home.bind('<Button-1>', self.deanimate_pwd_entry)
+    #     home.bind('<Button-1>', self.deanimate_user_entry)
 
     def animate_user_entry(self, event):
         self.user_entry_rel_width += 0.016
@@ -109,7 +128,7 @@ class frame(ctk.CTkFrame):
         user = self.username_var.get()
         pwd = self.pwd_var.get()
         database = 'empproject'
-
+        connection = None
         try:
             connection = pymysql.connect(host=host, user=user, password=pwd, database=database)
         except pymysql.err.OperationalError:
@@ -129,8 +148,6 @@ class frame(ctk.CTkFrame):
         
 
 home = login_window(300, 300)
-
-conneecion = None
 
 # connection = frame(None).establish_connection()
 # cursor = connection.cursor()

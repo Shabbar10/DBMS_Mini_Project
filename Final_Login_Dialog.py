@@ -1,10 +1,11 @@
 import customtkinter as ctk
 import pymysql
+import Main_Window as main
 
 global connection
 connection = None
 
-class login_window(ctk.CTkToplevel):
+class login_window(ctk.CTk):
     def __init__(self, width, height):
         super().__init__()
         center_x = int((self.winfo_screenwidth() - width) / 2)
@@ -141,15 +142,24 @@ class frame(ctk.CTkFrame):
             print('Success')
             self.error.configure(text_color='green')
             self.error.configure(text='Login Successful')
-            home.after(1500, home.destroy)
+            home.after(1000, home.withdraw)
+            home.after(1000, self.call_main_app)
 
-        return connection
+        self.connection = connection
+        self.cursor = self.connection.cursor()
+
+    def call_main_app(self):
+        self.mainwindow = main.App((1280, 720), self.connection.user.decode('utf-8'))
+
+        self.mainwindow.protocol("WM_DELETE_WINDOW", lambda e=None: self.open(e))
+
+    def open(self, event):
+        self.mainwindow.destroy()
+        # print('Soup')
+        home.after(500, home.deiconify)
+        # home.deiconify()
+       
         
-home = login_window(400, 300)
-home.mainloop()
-
-def send_connection():
-    global connection
-    return connection
-
-
+if __name__ == "__main__":
+    home = login_window(400, 300)
+    home.mainloop()

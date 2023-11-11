@@ -1,17 +1,8 @@
 import customtkinter as ctk
 from PIL import Image
-import Final_Login_Dialog as login
 
 
-connection = login.send_connection()
-cursor = connection.cursor()
-cursor.execute('SELECT * FROM employee;')
-results = cursor.fetchall()
-for i in results:
-    print(i)
-
-
-class App(ctk.CTk):
+class App(ctk.CTkToplevel):
     def __init__(self, dimensions, user):
         super().__init__()
         # self.update()
@@ -34,8 +25,6 @@ class App(ctk.CTk):
 
         left_frame.place(relx=0, rely=0, relwidth=0.69, relheight=1)
         right_frame.place(relx=0.69, rely=0, relwidth=0.31, relheight=1)
-
-        self.mainloop()
 
 
 class Left_Frame(ctk.CTkFrame):
@@ -114,6 +103,3 @@ class Right_Admin_Frame(Right_Frame):
         super().__init__(parent)
 
         # Setup commands for all buttons
-
-
-window = App((1280,720), connection.user.decode('utf-8'))

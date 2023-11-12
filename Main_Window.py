@@ -1,5 +1,9 @@
 import customtkinter as ctk
 from PIL import Image
+import pygame
+
+is_muted = False
+
 
 class App(ctk.CTkToplevel):
     def __init__(self, dimensions, connection):
@@ -30,17 +34,43 @@ class Left_Frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color='#333333')
         self.create_widgets()
+        self.play_music()
     
     def create_widgets(self):
         self.mute_image = ctk.CTkImage(Image.open('mute.png'), size=(30,30))
         self.mute_label = ctk.CTkLabel(self, text='', image=self.mute_image)
+        self.mute_button = ctk.CTkButton(self, image=self.mute_image, text='', fg_color='transparent', command=lambda e=None: self.toggle_mute(e), width=15)
+
         self.welcome_label = ctk.CTkLabel(self, text='Welcome, whoever')
 
         self.logout_button = ctk.CTkButton(self)
 
         # Layout
-        self.mute_label.place(x=5, y=5)
+        self.mute_button.place(x=5, y=5)
         self.welcome_label.place(relx=0.5, rely=0.88, anchor='center')
+
+    def play_music(self):
+        pygame.mixer.init()
+        pygame.mixer.music.load("Vega.mp3")
+        pygame.mixer.music.play(-1) # Loop indefinitely
+
+    # def stop_music(self):
+    #     pygame.mixer.music.stop()
+
+    def toggle_mute(self, event):
+        global is_muted
+        if is_muted:
+            pygame.mixer.music.set_volume(1.0)
+            self.mute_image = ctk.CTkImage(Image.open('mute.png'), size=(30,30))
+            is_muted = False
+        else:
+            pygame.mixer.music.set_volume(0.0)
+            self.mute_image = ctk.CTkImage(Image.open('sound.png'), size=(30,30))
+            is_muted = True
+
+        self.mute_label = ctk.CTkLabel(self, text='', image=self.mute_image)
+        self.mute_button = ctk.CTkButton(self, image=self.mute_image, text='', fg_color='transparent', command=lambda e=None: self.toggle_mute(e), width=15)
+        self.mute_button.place(x=5, y=5)
 
 
 class Left_User_Frame(Left_Frame):

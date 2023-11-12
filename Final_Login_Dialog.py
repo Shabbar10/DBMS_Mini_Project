@@ -5,6 +5,7 @@ import Main_Window as main
 
 ctk.set_appearance_mode('dark')
 
+
 class login_window(ctk.CTk):
     def __init__(self, width, height):
         super().__init__()
@@ -18,7 +19,7 @@ class login_window(ctk.CTk):
 
         self.bind('<Escape>', lambda e: self.destroy())
         self.bind('<Button-1>', lambda e: self.deanimate_all(e))
-    
+
     def deanimate_all(self, event):
         self.main_container.center_frame.deanimate_user_entry(event)
         self.main_container.center_frame.deanimate_pwd_entry(event)
@@ -134,7 +135,7 @@ class frame(ctk.CTkFrame):
         host = 'localhost'
         user = self.username_var.get()
         pwd = self.pwd_var.get()
-        database = 'empproject'
+        database = 'HospitalMS'
         try:
             self.connection = pymysql.connect(host=host, user=user, password=pwd, database=database)
         except pymysql.err.OperationalError:
@@ -142,17 +143,15 @@ class frame(ctk.CTkFrame):
             self.error.configure(text='Username/Password Invalid')
             self.username_entry.configure(border_color='red')
             self.pswd_entry.configure(border_color='red')
-            print('Failure')
         else:
             self.error.configure(text='')
-            print('Success')
             self.error.configure(text_color='green')
             self.error.configure(text='Login Successful')
             home.after(1000, home.withdraw)
             home.after(1000, self.call_main_app)
 
     def call_main_app(self):
-        self.mainwindow = main.App((1280, 720), self.connection.user.decode('utf-8'))
+        self.mainwindow = main.App((1280, 720), self.connection)
 
         self.logout_btn = ctk.CTkImage(Image.open('white_logout.png'), size=(30,30))
         self.logout_label = ctk.CTkLabel(self.mainwindow.left_frame, image=self.logout_btn, text='')
@@ -161,9 +160,6 @@ class frame(ctk.CTkFrame):
         self.logout_button.place(x = 5, y = 715, anchor='sw')
 
         self.mainwindow.protocol("WM_DELETE_WINDOW", lambda e=None: self.close(e))
-
-    def send_connection(self):
-        return self.connection
 
     def reopen(self, event):
         self.mainwindow.destroy()
@@ -178,4 +174,5 @@ class frame(ctk.CTkFrame):
 
 if __name__ == "__main__":
     home = login_window(400, 300)
+
     home.mainloop()

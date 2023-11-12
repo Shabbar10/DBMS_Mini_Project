@@ -1,12 +1,12 @@
 import customtkinter as ctk
 from PIL import Image
 
-
-
 class App(ctk.CTkToplevel):
-    def __init__(self, dimensions, user):
+    def __init__(self, dimensions, connection):
         super().__init__()
-        # self.update()
+
+        self.connection = connection
+        user = self.connection.user.decode('utf-8')
 
         center_x = int((self.winfo_screenwidth() - dimensions[0]) / 2)
         center_y = int((self.winfo_screenheight() - dimensions[1]) / 2)
@@ -15,14 +15,12 @@ class App(ctk.CTkToplevel):
         self.title('Hospital Management System')
         self.minsize(dimensions[0], dimensions[1])
 
-        print(f'\n\nThe user is {user}\n\n')
-
         if user == 'root':
             self.left_frame = Left_Admin_Frame(self)
-            right_frame = Right_Admin_Frame(self)
+            right_frame = Right_Admin_Frame(self, self.connection)
         elif user == 'guest':
             self.left_frame = Left_User_Frame(self)
-            right_frame = Right_User_Frame(self)
+            right_frame = Right_User_Frame(self, self.connection)
 
         self.left_frame.place(relx=0, rely=0, relwidth=0.69, relheight=1)
         right_frame.place(relx=0.69, rely=0, relwidth=0.31, relheight=1)
@@ -71,7 +69,7 @@ class Right_Frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.create_widgets()
-
+        
     def create_widgets(self):
         self.insert_button = ctk.CTkButton(self, text='Insert Record(s)', corner_radius=13, font=('Helvetica', 16), fg_color='transparent', border_width=3, border_color='#00FFFF')
         self.view_button = ctk.CTkButton(self, text='View Record(s)', corner_radius=13, font=('Helvetica', 16), fg_color='transparent', border_width=3, border_color='#00FFFF')
@@ -116,8 +114,10 @@ class Right_Frame(ctk.CTkFrame):
 
 
 class Right_User_Frame(Right_Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, connection):
         super().__init__(parent)
+
+        self.connection = connection
 
         # Disable buttons
         self.view_button.configure(state='disbaled', border_color='black', fg_color='#1f1f1f')
@@ -133,14 +133,7 @@ class Right_User_Frame(Right_Frame):
         user_insert_window.geometry('300x450')
         user_insert_window.grab_set()
 
-        # Patient table has 6 attributes
-        # Patient Name
-        # DOB
-        # Sex
-        # Address
-        # Branch_ID
-        # Room No
-
+        # Frame
         frame = ctk.CTkFrame(user_insert_window)
         frame.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -159,7 +152,7 @@ class Right_User_Frame(Right_Frame):
         room_no_label = ctk.CTkLabel(frame, text='Room No.', font=('Helvetica', 14))
 
         # Submit Button
-        submit_button = ctk.CTkButton(frame, text='Submit', command=None, fg_color='#144870', text_color='black', hover_color='cyan')
+        submit_button = ctk.CTkButton(frame, text='Submit', command=self.commit_data, fg_color='#144870', text_color='black', hover_color='cyan')
 
         # Textvariables
         self.p_name_var = ctk.StringVar()
@@ -173,11 +166,9 @@ class Right_User_Frame(Right_Frame):
         p_name_entry = ctk.CTkEntry(frame, textvariable=self.p_name_var)
         dob_entry = ctk.CTkEntry(frame, textvariable=self.dob_var)
         sex_entry = ctk.CTkEntry(frame, textvariable=self.sex_var)
-        address_textbox = ctk.CTkTextbox(frame, font=('Helvetica', 14), fg_color='#343638', height=30, border_color='#565b5e', border_width=2, activate_scrollbars=False)
+        self.address_textbox = ctk.CTkTextbox(frame, font=('Helvetica', 14), fg_color='#343638', height=30, border_color='#565b5e', border_width=2, activate_scrollbars=False)
         branch_id_entry = ctk.CTkEntry(frame, textvariable=self.branch_id_var)
         room_no_entry = ctk.CTkEntry(frame, textvariable=self.room_no_var)
-
-        self.address_var.set(address_textbox.get('1.0', ctk.END))
 
         # Layout
         p_name_label.grid(column=0, row=0, sticky='e')
@@ -190,14 +181,20 @@ class Right_User_Frame(Right_Frame):
         p_name_entry.grid(column=1, row=0, sticky='ew', padx=10)
         dob_entry.grid(column=1, row=1, sticky='ew', padx=10)
         sex_entry.grid(column=1, row=2, sticky='ew', padx=10)
-        address_textbox.grid(column=1, row=3, sticky='nsew', padx=10)
+        self.address_textbox.grid(column=1, row=3, sticky='nsew', padx=10)
         branch_id_entry.grid(column=1, row=4, sticky='ew', padx=10)
         room_no_entry.grid(column=1, row=5, sticky='ew', padx=10)
 
         submit_button.grid(column=0, row=6, columnspan=2)
 
     def commit_data(self):
-        pass
+        cursor = self.connection.cursor()
+        query = 'INSERT INTO patient(P_name, DOB, Sex, Address, Branch_ID, Room_no) values (%s, %s, %s, %s, %s, %s)'
+        self.address_var.set(self.address_textbox.get('1.0', ctk.END))
+
+        values = (self.p_name_var.get(), self.dob_var.get(), self.sex_var.get(), self.address_var.get(), int(self.branch_id_var.get()), int(self.room_no_var.get()))
+        cursor.execute(query, values)
+        self.connection.commit()
         
 
 class Right_Admin_Frame(Right_Frame):

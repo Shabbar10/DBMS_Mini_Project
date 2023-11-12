@@ -50,11 +50,18 @@ BEGIN
     IF NEW.Available > NEW.Capacity THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Room availability cannot exceed room capacity';
     END IF;
-END;
-//
+END //
 
 DELIMITER ;
 
+DELIMITER //
+CREATE TRIGGER SetNull
+BEFORE INSERT ON Patient
+FOR EACH ROW
+BEGIN
+	SET NEW.P_Name = NULLIF(NEW.P_Name, '');
+END //
+DELIMITER ;
           
 -- strong
 CREATE TABLE Patient(PID INT PRIMARY KEY auto_increment,
@@ -180,10 +187,18 @@ insert into patient(P_name, DOB, Sex, Address, Branch_ID, Room_no) values('surab
 
 insert into Employee values (10, NULL, 122, '12-12-12', 10, 1);-- error code 1048 for not null
 
-
+DELETE FROM Patient WHERE PID = 1;
+DELETE FROM Patient WHERE PID = 2;
+DELETE FROM Patient WHERE PID = 3;
+DELETE FROM Patient WHERE PID = 4;
+DELETE FROM Patient WHERE PID = 5;
+DELETE FROM Patient WHERE PID = 6;
+DELETE FROM Patient WHERE PID = 7;
+DELETE FROM Patient WHERE PID = 8;
+DELETE FROM Patient WHERE PID = 9;
 
 select * from patient;
-
+ALTER TABLE PATIENT AUTO_INCREMENT=1;
 
 
 

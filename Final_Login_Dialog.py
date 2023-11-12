@@ -47,8 +47,8 @@ class frame(ctk.CTkFrame):
         pwd_label = ctk.CTkLabel(self, text='Password', text_color='white', font=("Helvetica", 14))
 
         # Entry widgets
-        self.username_var = ctk.StringVar(value='guest')
-        self.pwd_var = ctk.StringVar()
+        self.username_var = ctk.StringVar(value='root')
+        self.pwd_var = ctk.StringVar(value='root')
 
         self.username_entry = ctk.CTkEntry(self,
                                            placeholder_text="username", 

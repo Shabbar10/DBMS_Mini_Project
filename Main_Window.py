@@ -2,6 +2,7 @@ import customtkinter as ctk
 from PIL import Image
 import pygame
 from pymysql import err
+import Admin_Fns as af
 
 is_muted = False
 
@@ -161,7 +162,12 @@ class Right_User_Frame(Right_Frame):
     def user_insert(self):
         self.user_insert_window = ctk.CTkToplevel()
         self.user_insert_window.title('User Insert')
-        self.user_insert_window.geometry('300x450')
+        self.update()
+
+        center_x = int((self.winfo_screenwidth() - 300) / 2)
+        center_y = int((self.winfo_screenheight() - 450) / 2)
+
+        self.user_insert_window.geometry(f'300x450+{center_x}+{center_y}')
         self.user_insert_window.grab_set()
 
         # Frame
@@ -283,7 +289,7 @@ class Right_User_Frame(Right_Frame):
 '''
 
 class Right_Admin_Frame(Right_Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, connection):
         super().__init__(parent)
 
-        # Setup commands for all buttons
+        self.insert_button.configure(command=af.Insert)

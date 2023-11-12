@@ -1,9 +1,9 @@
 import customtkinter as ctk
 import pymysql
+from PIL import Image
 import Main_Window as main
 
-global connection
-connection = None
+ctk.set_appearance_mode('dark')
 
 class login_window(ctk.CTk):
     def __init__(self, width, height):
@@ -36,6 +36,8 @@ class frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color="transparent", border_color="cyan", border_width=1,  height= 300, width= 300)
 
+        self.connection = pymysql.connect
+
         # Login Label
         login_label = ctk.CTkLabel(self, text="Login", font=("Helvetica", 20, "bold"), text_color="white") 
 
@@ -44,7 +46,7 @@ class frame(ctk.CTkFrame):
         pwd_label = ctk.CTkLabel(self, text='Password', text_color='white', font=("Helvetica", 14))
 
         # Entry widgets
-        self.username_var = ctk.StringVar()
+        self.username_var = ctk.StringVar(value='guest')
         self.pwd_var = ctk.StringVar()
 
         self.username_entry = ctk.CTkEntry(self,
@@ -82,6 +84,11 @@ class frame(ctk.CTkFrame):
                                font=("Helvetica", 15), 
                                text_color="white", 
                                command=self.establish_connection)
+
+        # Logout image button
+        self.logout_btn = ctk.CTkButton
+        self.logout_label = ctk.CTkButton
+        self.logout_button = ctk.CTkButton
 
         # Placing Widgets
         login_label.place(relx=0.5, rely=0.1, anchor='center')
@@ -128,9 +135,8 @@ class frame(ctk.CTkFrame):
         user = self.username_var.get()
         pwd = self.pwd_var.get()
         database = 'empproject'
-        global connection
         try:
-            connection = pymysql.connect(host=host, user=user, password=pwd, database=database)
+            self.connection = pymysql.connect(host=host, user=user, password=pwd, database=database)
         except pymysql.err.OperationalError:
             self.error.configure(text='')
             self.error.configure(text='Username/Password Invalid')
@@ -145,21 +151,31 @@ class frame(ctk.CTkFrame):
             home.after(1000, home.withdraw)
             home.after(1000, self.call_main_app)
 
-        self.connection = connection
-        self.cursor = self.connection.cursor()
-
     def call_main_app(self):
         self.mainwindow = main.App((1280, 720), self.connection.user.decode('utf-8'))
 
-        self.mainwindow.protocol("WM_DELETE_WINDOW", lambda e=None: self.open(e))
+        self.logout_btn = ctk.CTkImage(Image.open('white_logout.png'), size=(30,30))
+        self.logout_label = ctk.CTkLabel(self.mainwindow.left_frame, image=self.logout_btn, text='')
+        self.logout_button = ctk.CTkButton(self.mainwindow.left_frame, text='', width=15, image=self.logout_btn, fg_color='transparent', command=lambda e=None: self.reopen(e), hover=False)
 
-    def open(self, event):
+        self.logout_button.place(x = 5, y = 715, anchor='sw')
+
+        self.mainwindow.protocol("WM_DELETE_WINDOW", lambda e=None: self.close(e))
+
+    def send_connection(self):
+        return self.connection
+
+    def reopen(self, event):
         self.mainwindow.destroy()
-        # print('Soup')
         home.after(500, home.deiconify)
-        # home.deiconify()
-       
+        self.username_entry.delete(0, ctk.END)
+        self.pswd_entry.delete(0, ctk.END)
+        self.error.configure(text='')
+
+    def close(self, event):
+        home.destroy()
         
+
 if __name__ == "__main__":
     home = login_window(400, 300)
     home.mainloop()

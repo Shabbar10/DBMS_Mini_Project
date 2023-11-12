@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 import pygame
+from pymysql import err
 
 is_muted = False
 
@@ -158,19 +159,19 @@ class Right_User_Frame(Right_Frame):
         self.insert_button.configure(command=self.user_insert)
 
     def user_insert(self):
-        user_insert_window = ctk.CTkToplevel()
-        user_insert_window.title('User Insert')
-        user_insert_window.geometry('300x450')
-        user_insert_window.grab_set()
+        self.user_insert_window = ctk.CTkToplevel()
+        self.user_insert_window.title('User Insert')
+        self.user_insert_window.geometry('300x450')
+        self.user_insert_window.grab_set()
 
         # Frame
-        frame = ctk.CTkFrame(user_insert_window)
+        frame = ctk.CTkFrame(self.user_insert_window)
         frame.place(x=0, y=0, relwidth=1, relheight=1)
 
         # Define grid
         frame.columnconfigure(0, weight=1)
         frame.columnconfigure(1, weight=2)
-        frame.rowconfigure((0,1,2,4,5,6), weight=1, uniform='a')
+        frame.rowconfigure((0,1,2,4,5,6,7), weight=1, uniform='a')
         frame.rowconfigure(3, weight=3)
 
         # Labels
@@ -180,13 +181,14 @@ class Right_User_Frame(Right_Frame):
         address_label = ctk.CTkLabel(frame, text='Address', font=('Helvetica', 14))
         branch_id_label = ctk.CTkLabel(frame, text='Branch ID', font=('Helvetica', 14))
         room_no_label = ctk.CTkLabel(frame, text='Room No.', font=('Helvetica', 14))
+        self.error_label = ctk.CTkLabel(frame, text='', text_color='red', font=('Helvetica', 14))
 
         # Submit Button
         submit_button = ctk.CTkButton(frame, text='Submit', command=self.commit_data, fg_color='#144870', text_color='black', hover_color='cyan')
 
         # Textvariables
         self.p_name_var = ctk.StringVar()
-        self.dob_var = ctk.StringVar()
+        self.dob_var = ctk.StringVar(value='yyyy/mm/dd')
         self.sex_var = ctk.StringVar()
         self.address_var = ctk.StringVar()
         self.branch_id_var = ctk.StringVar()
@@ -215,17 +217,70 @@ class Right_User_Frame(Right_Frame):
         branch_id_entry.grid(column=1, row=4, sticky='ew', padx=10)
         room_no_entry.grid(column=1, row=5, sticky='ew', padx=10)
 
-        submit_button.grid(column=0, row=6, columnspan=2)
+        self.error_label.grid(column=0, row=6, columnspan=2)
+
+        submit_button.grid(column=0, row=7, columnspan=2)
+
+        # Event
+        dob_entry.bind('<Button-1>', lambda e: dob_entry.delete(0, ctk.END))
 
     def commit_data(self):
         cursor = self.connection.cursor()
         query = 'INSERT INTO patient(P_name, DOB, Sex, Address, Branch_ID, Room_no) values (%s, %s, %s, %s, %s, %s)'
         self.address_var.set(self.address_textbox.get('1.0', ctk.END))
+        try:
+            values = (self.p_name_var.get(), self.dob_var.get(), self.sex_var.get(), self.address_var.get(), int(self.branch_id_var.get()), int(self.room_no_var.get()))
+            cursor.execute(query, values)
+        except err.DataError as e:
+           print(f'ERROR1: {e}')
+        except err.IntegrityError as e: # Handles NOT NULL (1048), Branch or room not found (1216)
+            print(f'ERROR2: {e}')
+            error_code = e.args[0]
 
-        values = (self.p_name_var.get(), self.dob_var.get(), self.sex_var.get(), self.address_var.get(), int(self.branch_id_var.get()), int(self.room_no_var.get()))
-        cursor.execute(query, values)
-        self.connection.commit()
+            if error_code == 1048:
+                pass
+
+            self.error_label.configure(text='ERR hai laude')
+        except err.OperationalError as e: # Handles Room is full (Capacity !> 0) (1644)
+            print(f'ERROR3: {e}')
+        except err.InternalError as e:
+            print(f'ERROR4: {e}')
+        except err.ProgrammingError as e:
+            print(f'ERROR5: {e}')
+        except err.NotSupportedError as e:
+            print(f'ERROR6: {e}')
+        except ValueError as e:
+            print(f'ERROR7: {e}')
+        except TypeError as e:
+            print(f'ERROR8: {e}')
+        except AttributeError as e:
+            print(f'ERROR9: {e}')
+        except Exception as e:
+            print(f'ERROR10: {e}')
+        else:
+            self.connection.commit()
+            self.error_label.configure(text='Entry Recorded', text_color='green')
+            self.after(1500, self.user_insert_window.destroy)
         
+
+'''
+    except err.MySQLError as e:
+            error_code = e.args[0]
+
+            if error_code == 1644:                                          # Room availability <= 0
+                print(f'ERROR: {error_code}')
+            elif error_code == 1452:                                        # Branch ID or Room No not found
+                print(f'ERROR: {error_code}')
+            elif error_code == 1048:                                        # Not null violated
+                print(f'ERROR: {error_code}')
+            elif error_code == 3819:                                        # Check constraint violated
+                print(f'ERROR: {error_code}')
+            elif error_code == 1062:                                        # Duplicate entry
+                print(f'ERROR: {error_code}')
+            else:
+                print(f'ERROR: {error_code}')
+        else:
+'''
 
 class Right_Admin_Frame(Right_Frame):
     def __init__(self, parent):

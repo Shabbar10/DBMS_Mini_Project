@@ -157,7 +157,7 @@ class frame(ctk.CTkFrame):
         self.logout_label = ctk.CTkLabel(self.mainwindow.left_frame, image=self.logout_btn, text='')
         self.logout_button = ctk.CTkButton(self.mainwindow.left_frame, text='', width=15, image=self.logout_btn, fg_color='transparent', command=lambda e=None: self.reopen(e), hover=False)
 
-        self.logout_button.place(x = 5, y = 715, anchor='sw')
+        self.logout_button.place(x = 5, rely=0.98, anchor='sw')
 
         self.mainwindow.protocol("WM_DELETE_WINDOW", lambda e=None: self.close(e))
 
@@ -169,6 +169,7 @@ class frame(ctk.CTkFrame):
         self.error.configure(text='')
 
     def close(self, event):
+        self.connection.close()
         home.destroy()
         
 

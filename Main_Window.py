@@ -34,22 +34,29 @@ class App(ctk.CTkToplevel):
 
 class Left_Frame(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent, fg_color='#333333')
+        super().__init__(parent, fg_color='#0f0f0f')
         self.create_widgets()
-        self.play_music()
+        # self.play_music()
     
     def create_widgets(self):
-        self.mute_image = ctk.CTkImage(Image.open('mute.png'), size=(30,30))
+        self.mute_image = ctk.CTkImage(Image.open('white_mute.png'), size=(30,30))
         self.mute_label = ctk.CTkLabel(self, text='', image=self.mute_image)
-        self.mute_button = ctk.CTkButton(self, image=self.mute_image, text='', fg_color='transparent', command=lambda e=None: self.toggle_mute(e), width=15)
+        self.mute_button = ctk.CTkButton(self, image=self.mute_image, text='', fg_color='transparent', command=lambda e=None: self.toggle_mute(e), width=15, hover=False)
 
         self.welcome_label = ctk.CTkLabel(self, text='Welcome, whoever')
 
+        title_label = ctk.CTkLabel(self, text='United States of Smash', font=('Consolas', 35, "bold"))
+
         self.logout_button = ctk.CTkButton(self)
+
+        logo = ctk.CTkImage(Image.open('logo.jpg'), size=(100, 100))
+        self.logo_label = ctk.CTkLabel(self, text='', image=logo)
 
         # Layout
         self.mute_button.place(x=5, y=5)
         self.welcome_label.place(relx=0.5, rely=0.88, anchor='center')
+        self.logo_label.place(relx=0.985, rely=0.015, anchor='ne')
+        title_label.place(relx=0.5, rely=0.04, anchor='center')
 
     def play_music(self):
         pygame.mixer.init()
@@ -63,15 +70,15 @@ class Left_Frame(ctk.CTkFrame):
         global is_muted
         if is_muted:
             pygame.mixer.music.set_volume(1.0)
-            self.mute_image = ctk.CTkImage(Image.open('mute.png'), size=(30,30))
+            self.mute_image = ctk.CTkImage(Image.open('white_mute.png'), size=(30,30))
             is_muted = False
         else:
             pygame.mixer.music.set_volume(0.0)
-            self.mute_image = ctk.CTkImage(Image.open('sound.png'), size=(30,30))
+            self.mute_image = ctk.CTkImage(Image.open('white_sound.png'), size=(30,30))
             is_muted = True
 
         self.mute_label = ctk.CTkLabel(self, text='', image=self.mute_image)
-        self.mute_button = ctk.CTkButton(self, image=self.mute_image, text='', fg_color='transparent', command=lambda e=None: self.toggle_mute(e), width=15)
+        self.mute_button = ctk.CTkButton(self, image=self.mute_image, text='', fg_color='transparent', command=lambda e=None: self.toggle_mute(e), width=15, hover=False)
         self.mute_button.place(x=5, y=5)
 
 
@@ -92,14 +99,14 @@ class Left_Admin_Frame(Left_Frame):
 
         self.profile_pic = ctk.CTkImage(Image.open('Saurab.png'), size=(378,504))
         self.profile_label = ctk.CTkLabel(self, image=self.profile_pic, text='')
-        self.profile_label.place(relx=0.5, rely=0.43, anchor='center')
+        self.profile_label.place(relx=0.5, rely=0.5, anchor='center')
 
         self.welcome_label.configure(text='Welcome, Admin', font=('Consolas', 20, "bold"))
 
 
 class Right_Frame(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent, fg_color='#171717', border_width=1, border_color='cyan')
         self.create_widgets()
         
     def create_widgets(self):
@@ -288,8 +295,12 @@ class Right_User_Frame(Right_Frame):
         else:
 '''
 
+
 class Right_Admin_Frame(Right_Frame):
     def __init__(self, parent, connection):
         super().__init__(parent)
 
-        self.insert_button.configure(command=af.Insert)
+        self.insert_button.configure(command=lambda: af.Insert(connection))
+        self.view_button.configure(command=lambda: af.View(connection))
+        self.delete_button.configure(command=lambda: af.Delete(connection))
+        self.update_button.configure(command=lambda: af.Update(connection))

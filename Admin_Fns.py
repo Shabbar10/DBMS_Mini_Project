@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk
+# import ttkbootstrap as ttk
 from PIL import Image
 
 class Insert(ctk.CTkToplevel):
@@ -764,24 +765,31 @@ class View(ctk.CTkToplevel):
 
         self.update()
 
-        center_x = int((self.winfo_screenwidth() - 600) / 2)
+        center_x = int((self.winfo_screenwidth() - 550) / 2)
         center_y = int((self.winfo_screenheight() - 350) / 2)
 
-        self.geometry(f'700x350+{center_x}+{center_y}')
+        self.geometry(f'550x350+{center_x}+{center_y}')
         self.title('Admin View')
         self.grab_set()
         self.create_widgets()
 
-        self.view_frame = ctk.CTkFrame(self)
+        # self.view_frame = ctk.CTkFrame(self)
 
     def create_widgets(self):
         self.choice_frame = ctk.CTkFrame(self)
-        # self.view_frame = ctk.CTkFrame(self)
+        self.view_frame = ctk.CTkFrame(self, fg_color='#f0f0f0')
 
         # Choice Tabs
         self.tabs = ctk.CTkTabview(self.choice_frame)
         self.hospital = self.tabs.add('Hospital')
+
         self.employee = self.tabs.add('Employee')
+        self.emp_frame = ctk.CTkFrame(self.employee)
+        self.doc_nurse_frame = ctk.CTkFrame(self.employee)
+        self.doc_nurse_tabs = ctk.CTkTabview(self.doc_nurse_frame)
+        self.doc = self.doc_nurse_tabs.add('Doctor')
+        self.nurse = self.doc_nurse_tabs.add('Nurse')
+
         self.room = self.tabs.add('Room')
         self.patient = self.tabs.add('Patient')
         self.patient_records = self.tabs.add('Patient Record')
@@ -789,15 +797,22 @@ class View(ctk.CTkToplevel):
         self.cares_for = self.tabs.add('Assigned Nurse')
 
         self.hospital_choice()
+        self.employee_choice()
+        self.doc_choice()
+        self.nurse_choice()
 
         # Layout
         self.choice_frame.pack(expand=True, fill='both')
         self.tabs.pack(expand=True, fill='both')
+        self.emp_frame.pack(expand=True, fill='both', side='left')
+        self.doc_nurse_tabs.pack(expand=True, fill='both')
+        self.doc_nurse_frame.pack(expand=True, fill='both', side='left')
         print('Hi')
 
     def hospital_choice(self):
         # Define the grid
-        self.hospital.columnconfigure(0)
+        self.hospital.columnconfigure(0, weight=1, uniform='a')
+        self.hospital.columnconfigure(1, weight=2)
         self.hospital.rowconfigure((0,1,2,3), weight=1, uniform='a')
 
         # Variables
@@ -805,25 +820,178 @@ class View(ctk.CTkToplevel):
         branch_name_var = ctk.StringVar()
         address_var = ctk.StringVar()
 
+        # Textvariables
+        branch_id_where = ctk.StringVar()
+        branch_name_where = ctk.StringVar()
+        address_where = ctk.StringVar()
 
         # Checkboxes
-        branch_id_check = ctk.CTkCheckBox(self.hospital, text='Branch ID', variable=branch_id_var, onvalue='Branch_ID', offvalue='')
-        branch_name_check = ctk.CTkCheckBox(self.hospital, text='Branch Name', variable=branch_name_var, onvalue='H_Name', offvalue='')
-        address_check = ctk.CTkCheckBox(self.hospital, text='Address', variable=address_var, onvalue='Address', offvalue='')
+        branch_id_check = ctk.CTkCheckBox(self.hospital, text='Branch ID', variable=branch_id_var, onvalue='Branch_ID', offvalue='', command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
+        branch_name_check = ctk.CTkCheckBox(self.hospital, text='Branch Name', variable=branch_name_var, onvalue='H_Name', offvalue='', command=lambda: self.toggle_entry(branch_name_var.get(), branch_name_entry))
+        address_check = ctk.CTkCheckBox(self.hospital, text='Address', variable=address_var, onvalue='Address', offvalue='', command=lambda: self.toggle_entry(address_var.get(), address_entry))
 
-        # var_list = [branch_id_var.get(), branch_name_var.get(), address_var.get()]
+        # Entries
+        branch_id_entry = ctk.CTkEntry(self.hospital, textvariable=branch_id_where, state='disabled')
+        branch_name_entry = ctk.CTkEntry(self.hospital, textvariable=branch_name_where, state='disabled')
+        address_entry = ctk.CTkEntry(self.hospital, textvariable=address_where, state='disabled')
 
         # Show button
-        self.show_button = ctk.CTkButton(self.hospital,
+        show_button = ctk.CTkButton(self.hospital,
                                          text='Show',
-                                         command=lambda e=None: self.fetch_records('Hospital', (branch_id_var.get(), branch_name_var.get(), address_var.get())))
+                                         command=lambda e=None: self.fetch_records('Hospital', (branch_id_var.get(), branch_name_var.get(), address_var.get()), (branch_id_where.get(), branch_name_where.get(), address_where.get())))
 
         # Layout
         branch_id_check.grid(column=0, row=0, sticky='w')
         branch_name_check.grid(column=0, row=1, sticky='w')
         address_check.grid(column=0, row=2, sticky='w')
 
-        self.show_button.grid(column=0, row=3, sticky = 'ew')
+        branch_id_entry.grid(column=1, row=0, sticky='ew', padx=50)
+        branch_name_entry.grid(column=1, row=1, sticky='ew', padx=50)
+        address_entry.grid(column=1, row=2, sticky='ew', padx=50)
+
+        show_button.grid(column=0, row=3, columnspan=2)
+
+    def employee_choice(self):
+        # Define the grid
+        self.emp_frame.columnconfigure(0, weight=1)
+        self.emp_frame.columnconfigure(1, weight=2)
+        self.emp_frame.rowconfigure((0,1,2,3,4,5,6), weight=1)
+
+        # Variables
+        emp_id_var = ctk.StringVar()
+        emp_name_var = ctk.StringVar()
+        salary_var = ctk.StringVar()
+        doj_var = ctk.StringVar()
+        mgr_id_var = ctk.StringVar()
+        branch_id_var = ctk.StringVar()
+
+        # Textvariables
+        emp_id_where = ctk.StringVar()
+        emp_name_where = ctk.StringVar()
+        salary_where = ctk.StringVar()
+        doj_where = ctk.StringVar()
+        mgr_id_where = ctk.StringVar()
+        branch_id_where = ctk.StringVar()
+
+        # Checkboxes
+        emp_id_check = ctk.CTkCheckBox(self.emp_frame, text='Employee ID', variable=emp_id_var, onvalue='Emp_ID', offvalue='', command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
+        emp_name_check = ctk.CTkCheckBox(self.emp_frame, text='Employee Name', variable=emp_name_var, onvalue='Emp_Name', offvalue='', command=lambda: self.toggle_entry(emp_name_var.get(), emp_name_entry))
+        salary_check = ctk.CTkCheckBox(self.emp_frame, text='Salary', variable=salary_var, onvalue='Salary', offvalue='', command=lambda: self.toggle_entry(salary_var.get(), salary_entry))
+        doj_check = ctk.CTkCheckBox(self.emp_frame, text='DOJ', variable=doj_var, onvalue='DOJ', offvalue='', command=lambda: self.toggle_entry(doj_var.get(), doj_entry))
+        mgr_id_check = ctk.CTkCheckBox(self.emp_frame, text='Manager ID', variable=mgr_id_var, onvalue='MGR_ID', offvalue='', command=lambda: self.toggle_entry(mgr_id_var.get(), mgr_id_entry))
+        branch_id_check = ctk.CTkCheckBox(self.emp_frame, text='Branch ID', variable=branch_id_var, onvalue='Branch_ID', offvalue='', command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
+
+        # Entries
+        emp_id_entry = ctk.CTkEntry(self.emp_frame, textvariable=emp_id_where, state='disabled')
+        emp_name_entry = ctk.CTkEntry(self.emp_frame, textvariable=emp_name_where, state='disabled')
+        salary_entry = ctk.CTkEntry(self.emp_frame, textvariable=salary_where, state='disabled')
+        doj_entry = ctk.CTkEntry(self.emp_frame, textvariable=doj_where, state='disabled')
+        mgr_id_entry = ctk.CTkEntry(self.emp_frame, textvariable=mgr_id_where, state='disabled')
+        branch_id_entry = ctk.CTkEntry(self.emp_frame, textvariable=branch_id_where, state='disabled')
+
+        # Show button
+        show_button = ctk.CTkButton(self.emp_frame,
+                                         text='Show',
+                                         command=lambda e=None: self.fetch_records('Employee', (emp_id_var.get(), emp_name_var.get(), salary_var.get(), doj_var.get(), mgr_id_var.get(), branch_id_var.get()), (emp_id_where.get(), emp_name_where.get(), salary_where.get(), doj_where.get(), mgr_id_where.get(), branch_id_where.get())))
+        
+        # Layout
+        emp_id_check.grid(column=0, row=0, sticky='w')
+        emp_name_check.grid(column=0, row=1, sticky='w')
+        salary_check.grid(column=0, row=2, sticky='w')
+        doj_check.grid(column=0, row=3, sticky='w')
+        mgr_id_check.grid(column=0, row=4, sticky='w')
+        branch_id_check.grid(column=0, row=5, sticky='w')
+
+        emp_id_entry.grid(column=1, row=0, sticky='ew', padx=50)
+        emp_name_entry.grid(column=1, row=1, sticky='ew', padx=50)
+        salary_entry.grid(column=1, row=2, sticky='ew', padx=50)
+        doj_entry.grid(column=1, row=3, sticky='ew', padx=50)
+        mgr_id_entry.grid(column=1, row=4, sticky='ew', padx=50)
+        branch_id_entry.grid(column=1, row=5, sticky='ew', padx=50)
+
+        show_button.grid(column=0, row=6, columnspan=2)
+
+    def doc_choice(self):
+        # Define the grid
+        self.doc.columnconfigure(0, weight=1)
+        self.doc.columnconfigure(1, weight=2)
+        self.doc.rowconfigure((0,1,2), weight=1)
+
+        # Variables
+        emp_id_var = ctk.StringVar()
+        qualification_var = ctk.StringVar()
+
+        # Textvariables
+        emp_id_where = ctk.StringVar()
+        qualification_where = ctk.StringVar()
+
+        # Checkboxes
+        emp_id_check = ctk.CTkCheckBox(self.doc, text='Doctor ID', variable=emp_id_var, command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
+        qualification_check = ctk.CTkCheckBox(self.doc, text='Qualification', variable=emp_id_var, command=lambda: self.toggle_entry(qualification_var.get(), qualification_entry))
+
+        # Entries
+        emp_id_entry = ctk.CTkEntry(self.doc, textvariable=emp_id_where, state='disabled')
+        qualification_entry = ctk.CTkEntry(self.doc, textvariable=qualification_where, state='disabled')
+
+        # Show button
+        show_button = ctk.CTkButton(self.doc,
+                                         text='Show',
+                                         command=lambda e=None: self.fetch_records('Doctor', (emp_id_var.get(), qualification_var.get()), (emp_id_where.get(), qualification_where.get())))
+
+        # Layout
+        emp_id_check.grid(column=0, row=0, sticky='w')
+        qualification_check.grid(column=0, row=1, sticky='w')
+
+        emp_id_entry.grid(column=1, row=0, sticky='ew', padx=50)
+        qualification_entry.grid(column=1, row=1, sticky='ew', padx=50)
+
+        show_button.grid(column=0, row=2, columnspan=2)
+
+    def nurse_choice(self):
+        # Define the grid
+        self.nurse.columnconfigure(0, weight=1)
+        self.nurse.columnconfigure(1, weight=2)
+        self.nurse.rowconfigure((0,1,2), weight=1)
+
+        # Variables
+        emp_id_var = ctk.StringVar()
+        role_var = ctk.StringVar()
+
+        # Textvariables
+        emp_id_where = ctk.StringVar()
+        role_where = ctk.StringVar()
+
+        # Checkboxes
+        emp_id_check = ctk.CTkCheckBox(self.nurse, text='Nurse ID', variable=emp_id_var, command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
+        role_check = ctk.CTkCheckBox(self.nurse, text='Qualification', variable=emp_id_var, command=lambda: self.toggle_entry(role_var.get(), role_entry))
+
+        # Entries
+        emp_id_entry = ctk.CTkEntry(self.nurse, textvariable=emp_id_where, state='disabled')
+        role_entry = ctk.CTkEntry(self.nurse, textvariable=role_where, state='disabled')
+
+        # Show button
+        show_button = ctk.CTkButton(self.nurse,
+                                         text='Show',
+                                         command=lambda e=None: self.fetch_records('Nurse', (emp_id_var.get(), role_var.get()), (emp_id_where.get(), role_where.get())))
+
+        # Layout
+        emp_id_check.grid(column=0, row=0, sticky='w')
+        role_check.grid(column=0, row=1, sticky='w')
+
+        emp_id_entry.grid(column=1, row=0, sticky='ew', padx=50)
+        role_entry.grid(column=1, row=1, sticky='ew', padx=50)
+
+        show_button.grid(column=0, row=2, columnspan=2)
+
+    def room_choice(self):
+        # Define the grid
+        self.room.columnconfigure(0, weight=1)
+
+    def toggle_entry(self, where, entry):
+        if where == '':
+            entry.configure(state='disabled')
+        else:
+            entry.configure(state='normal')
 
     def check_zero(self, var_list):
         yes_count = 0
@@ -836,7 +1004,7 @@ class View(ctk.CTkToplevel):
         else:
             return False
 
-    def fetch_records(self, table, var_list):
+    def fetch_records(self, table, var_list, where_list):
         yes_count = 0
         for var in var_list:
             if var != '':
@@ -850,7 +1018,17 @@ class View(ctk.CTkToplevel):
             else:
                 cols += f', {var_list[i]}'
 
-        query = f"SELECT {cols} FROM {table};"
+        conditions = []
+        for i in range(yes_count):
+            if where_list[i] != '':
+                actual = f'{var_list[i]} {where_list[i]}'
+                conditions.append(actual)
+
+        query = f"SELECT {cols} FROM {table}"
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
         cursor = self.connection.cursor()
         cursor.execute(query)
         results = cursor.fetchall()
@@ -873,17 +1051,27 @@ class View(ctk.CTkToplevel):
                 foreground=[('selected', 'white')]    # Selected item text color
                 )
         
-        table = ttk.Treeview(self.view_frame, columns=col_list, show='headings', style='Treeview')
+        self.table = ttk.Treeview(self.view_frame, columns=col_list, show='headings', style='Treeview')
 
         for col in col_list:
-            table.heading(f'{col}', text=f'{col.title()}')
+            self.table.heading(f'{col}', text=f'{col.title()}')
 
         for row in results:
-            table.insert('', ctk.END, values=row)
+            self.table.insert('', ctk.END, values=row)
 
-        table.pack(expand=True, fill='both')
+        self.table.pack(expand=True, fill='both')
         self.view_frame.pack(expand=True, fill='both')
         self.choice_frame.pack_forget()
+
+        self.back_button = ctk.CTkButton(self.view_frame, text='Back', command=self.go_back)
+        self.back_button.pack()
+
+    def go_back(self):
+        self.table.delete(*self.table.get_children())
+        self.table.pack_forget()
+        self.back_button.pack_forget()
+        self.choice_frame.pack(expand=True, fill='both')
+        self.view_frame.pack_forget()
 
 
 class Delete(ctk.CTkToplevel):

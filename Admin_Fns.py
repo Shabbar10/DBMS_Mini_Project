@@ -1,6 +1,6 @@
 import customtkinter as ctk
-import pymysql
-from pymysql import err
+from tkinter import ttk
+from PIL import Image
 
 class Insert(ctk.CTkToplevel):
     def __init__(self, connection):
@@ -12,7 +12,7 @@ class Insert(ctk.CTkToplevel):
         center_x = int((self.winfo_screenwidth() - 600) / 2)
         center_y = int((self.winfo_screenheight() - 350) / 2)
 
-        self.geometry(f'600x350+{center_x}+{center_y}')
+        self.geometry(f'700x350+{center_x}+{center_y}')
         self.title('Admin Insert')
         self.grab_set()
         self.create_widgets()
@@ -35,6 +35,9 @@ class Insert(ctk.CTkToplevel):
         self.treatment = self.tabs.add('Treatment')
         self.cares_for = self.tabs.add('Assigned Nurse')
 
+        self.error_img = ctk.CTkImage(Image.open('error.png'))
+        self.done_img = ctk.CTkImage(Image.open('done.png'))
+
         self.hospital_form()
         self.employee_form()
         self.doctor_form()
@@ -52,11 +55,14 @@ class Insert(ctk.CTkToplevel):
         self.doc_nurse_frame.pack(side='left', expand=True, fill='both')
 
     def hospital_form(self):
+        self.id_list = list()
+        self.get_branch_id()        
         # Define grid
         self.hospital.columnconfigure(0, weight=1)
         self.hospital.columnconfigure(1, weight=2)
         self.hospital.rowconfigure((0,1,3),weight=1)
         self.hospital.rowconfigure(2,weight=1) # For address textbox
+        self.hospital.rowconfigure(4,weight=1) # For Submit button
 
         # Textvariables
         branch_id_var = ctk.StringVar()
@@ -66,10 +72,20 @@ class Insert(ctk.CTkToplevel):
         branch_id_label = ctk.CTkLabel(self.hospital, text='Branch ID', font=('Helvetica', 14))
         branch_name_label = ctk.CTkLabel(self.hospital, text='Branch Name', font=('Helvetica', 14))
         address_label = ctk.CTkLabel(self.hospital, text='Address', font=('Helvetica', 14))
-
+        self.h_error_label = ctk.CTkLabel(self.hospital, text=' ', text_color='red', font=('Helvetica', 14))
         # Entries
-        self.h_branch_id_entry = ctk.CTkEntry(self.hospital, textvariable=branch_id_var)
-        self.h_branch_name_entry = ctk.CTkEntry(self.hospital, textvariable=branch_name_var)
+        self.h_branch_id_entry = ctk.CTkEntry(self.hospital, textvariable=branch_id_var,
+                                               validatecommand = lambda  : self.check_entry(self.id_list,
+                                                                                            self.h_branch_id_entry.get(),
+                                                                                            self.h_branch_id_entry,
+                                                                                            self.h_error_label,
+                                                                                            submit_button), validate = "focusout")
+        
+        self.h_branch_name_entry = ctk.CTkEntry(self.hospital, textvariable=branch_name_var,
+                                                 validatecommand = lambda: self.not_null(submit_button,self.h_branch_name_entry,
+                                                                                          self.h_error_label ),
+                                                                                         validate = "focusout")
+                                                                                                                                     
         self.h_address_textbox = ctk.CTkTextbox(self.hospital, font=('Helvetica', 14), fg_color='#343638', height=100, width=370, border_color='#565b5e', border_width=2, activate_scrollbars=False)
 
         # Submit button
@@ -79,18 +95,19 @@ class Insert(ctk.CTkToplevel):
         branch_id_label.grid(column=0, row=0, sticky='e')
         branch_name_label.grid(column=0, row=1, sticky='e')
         address_label.grid(column=0, row=2, sticky='e')
+        self.h_error_label.grid(column=0, row=3, columnspan = 2, sticky = 'ns')
 
         self.h_branch_id_entry.grid(column=1, row=0, sticky='ew', padx=50)
         self.h_branch_name_entry.grid(column=1, row=1, sticky='ew', padx=50)
         self.h_address_textbox.grid(column=1, row=2, sticky='ew', padx=50)
 
-        submit_button.grid(column=0, row=3, columnspan=2)
+        submit_button.grid(column=0, row=4, columnspan=2)
 
     def employee_form(self):
         # Define grid
         self.emp_frame.columnconfigure(0, weight=1)
         self.emp_frame.columnconfigure(1, weight=2)
-        self.emp_frame.rowconfigure((0,1,2,3,4,5),weight=1)
+        self.emp_frame.rowconfigure((0,1,2,3,4,5,6),weight=1)
 
         # Textvariables
         emp_name_var = ctk.StringVar()
@@ -105,9 +122,12 @@ class Insert(ctk.CTkToplevel):
         doj_label = ctk.CTkLabel(self.emp_frame, text='DoJ', font=('Helvetica', 14))
         mgr_id_label = ctk.CTkLabel(self.emp_frame, text='Manager ID', font=('Helvetica', 14))
         branch_id_label = ctk.CTkLabel(self.emp_frame, text='Branch ID', font=('Helvetica', 14))
+        e_error_label = ctk.CTkLabel(self.emp_frame, text='', font=('Helvetica', 14), text_color= 'red')
 
         # Entries
-        self.e_emp_name_entry = ctk.CTkEntry(self.emp_frame, textvariable=emp_name_var)
+        self.e_emp_name_entry = ctk.CTkEntry(self.emp_frame, textvariable=emp_name_var, validatecommand = lambda: self.not_null(submit_button,self.e_emp_name_entry,
+                                                                                          e_error_label ),
+                                                                                         validate = "focusout")
         self.e_salary_entry = ctk.CTkEntry(self.emp_frame, textvariable=salary_var)
         self.e_doj_entry = ctk.CTkEntry(self.emp_frame, textvariable=doj_var)
 
@@ -147,6 +167,7 @@ class Insert(ctk.CTkToplevel):
         doj_label.grid(column=0, row=2, sticky='e')
         mgr_id_label.grid(column=0, row=3, sticky='e')
         branch_id_label.grid(column=0, row=4, sticky='e')
+        e_error_label.grid(column=0, row=5, sticky='ns', columnspan=2)
 
         self.e_emp_name_entry.grid(column=1, row=0, sticky='ew', padx=50)
         self.e_salary_entry.grid(column=1, row=1, sticky='ew', padx=50)
@@ -154,7 +175,7 @@ class Insert(ctk.CTkToplevel):
         mgr_id_combo.grid(column=1, row=3, sticky='ew', padx=50)
         branch_id_combo.grid(column=1, row=4, sticky='ew', padx=50)
 
-        submit_button.grid(column=0, row=5, columnspan=2)
+        submit_button.grid(column=0, row=6, columnspan=2)
 
     def doctor_form(self):
         # Define the grid
@@ -209,7 +230,7 @@ class Insert(ctk.CTkToplevel):
         # Define the grid
         self.nurse.columnconfigure(0, weight=1)
         self.nurse.columnconfigure(1, weight=2)
-        self.nurse.rowconfigure((0,1,), weight=1)
+        self.nurse.rowconfigure((0,1), weight=1)
         self.nurse.rowconfigure(2, weight=4)
 
         # Textvariables
@@ -258,14 +279,14 @@ class Insert(ctk.CTkToplevel):
         # Define the grid
         self.room.columnconfigure(0, weight=1)
         self.room.columnconfigure(1, weight=2)
-        self.room.rowconfigure((0,1,2,3,4,5), weight=1)
+        self.room.rowconfigure((0,1,2,3,4,5,6), weight=1)
 
         # Textvariables
         room_no_var = ctk.StringVar()
         branch_id_var = ctk.StringVar()
         room_type_var = ctk.StringVar()
-        capactiy_var = ctk.StringVar()
-        available_var = ctk.StringVar()
+        capactiy_var = ctk.StringVar(value = '0')
+        available_var = ctk.StringVar(value = '0')
 
         # Labels
         room_no_label = ctk.CTkLabel(self.room, text='Room No', font=('Helvetica', 14))
@@ -273,12 +294,13 @@ class Insert(ctk.CTkToplevel):
         room_type_label = ctk.CTkLabel(self.room, text='Room Type', font=('Helvetica', 14))
         capactiy_label = ctk.CTkLabel(self.room, text='Capacity', font=('Helvetica', 14))
         available_label = ctk.CTkLabel(self.room, text='Availability', font=('Helvetica', 14))
+        err_label = ctk.CTkLabel(self.room, text='', font=('Helvetica', 14), text_color='red')
 
         # Entries
         self.r_room_no_entry = ctk.CTkEntry(self.room)
         self.r_room_type_entry = ctk.CTkEntry(self.room)
-        self.r_capactiy_entry = ctk.CTkEntry(self.room)
-        self.r_available_entry = ctk.CTkEntry(self.room)
+        self.r_capactiy_entry = ctk.CTkEntry(self.room, textvariable= capactiy_var)
+        self.r_available_entry = ctk.CTkEntry(self.room, textvariable= available_var)
 
         # Combobox
         cursor = self.connection.cursor()
@@ -302,20 +324,26 @@ class Insert(ctk.CTkToplevel):
                                       text_color='black', 
                                       hover_color='cyan')
 
+        self.r_available_entry.configure(validatecommand = lambda : self.room_details( int(self.r_capactiy_entry.get()),
+                                                                                                      int(self.r_available_entry.get()),
+                                                                                                      self.r_available_entry,
+                                                                                                      err_label,
+                                                                                                      submit_button), validate = "focus")
         # Layout
         room_no_label.grid(column=0, row=0, sticky='e')
         branch_id_label.grid(column=0, row=1, sticky='e')
-        room_type_label.grid(column=0, row=2, sticky='e')
-        capactiy_label.grid(column=0, row=3, sticky='e')
-        available_label.grid(column=0, row=4, sticky='e')
+        room_type_label.grid(column=0, row=4, sticky='e')
+        capactiy_label.grid(column=0, row=2, sticky='e')
+        available_label.grid(column=0, row=3, sticky='e')
+        err_label.grid(column=0, row=5, sticky='ns', columnspan = 2)
 
         self.r_room_no_entry.grid(column=1, row=0, sticky='ew', padx=50)
         branch_id_combo.grid(column=1, row=1, sticky='ew', padx=50)
-        self.r_room_type_entry.grid(column=1, row=2, sticky='ew', padx=50)
-        self.r_capactiy_entry.grid(column=1, row=3, sticky='ew', padx=50)
-        self.r_available_entry.grid(column=1, row=4, sticky='ew', padx=50)
+        self.r_room_type_entry.grid(column=1, row=4, sticky='ew', padx=50)
+        self.r_capactiy_entry.grid(column=1, row=2, sticky='ew', padx=50)
+        self.r_available_entry.grid(column=1, row=3, sticky='ew', padx=50)
 
-        submit_button.grid(column=0, row=5, columnspan=2)
+        submit_button.grid(column=0, row=6, columnspan=2)
 
     def patient_form(self):
         # Define grid
@@ -368,26 +396,7 @@ class Insert(ctk.CTkToplevel):
                 
             my_dict[bid] = room_no_list
 
-        
-
-        # branch_id_list = []
-
-        # for bid in results:
-        #     branch_id_list.append(str(bid[0]))
-
-        # cursor.execute('SELECT Room_no FROM Room;')
-        # results = cursor.fetchall()
-        # room_no_list = []
-
-        # for rno in results:
-        #     room_no_list.append(str(rno[0]))
-
-        # for bid in branch_id_list:
-        #     pass
-
-
         branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var)
-        # room_no_combo = ctk.CTkComboBox(self.patient, values=room_no_list, variable=room_no_var)
 
         cursor.close()
 
@@ -412,7 +421,6 @@ class Insert(ctk.CTkToplevel):
         sex_entry.grid(column=1, row=2, sticky='ew', padx=50)
         address_textbox.grid(column=1, row=3, sticky='nsew', padx=50)
         branch_id_combo.grid(column=1, row=4, sticky='ew', padx=50)
-        # room_no_combo.grid(column=1, row=5, sticky='ew', padx=50)
 
         submit_button.grid(column=0, row=7, columnspan=2)
 
@@ -643,15 +651,239 @@ class Insert(ctk.CTkToplevel):
             self.geometry(f'700x350+{center_x}+{center_y}')
 
         elif self.tabs.get() == 'Treatment':
-            pass
+            center_y = int((self.winfo_screenheight() - 350) / 2)
+            print('Hospital')
+            self.geometry(f'700x350+{center_x}+{center_y}')
 
         elif self.tabs.get() == 'Assigned Nurse':
-            pass
+            center_y = int((self.winfo_screenheight() - 350) / 2)
+            print('Hospital')
+            self.geometry(f'700x350+{center_x}+{center_y}')
+
+    def not_null(self, submit, err_widget, label):
+        input = err_widget.get()
+        if  len(input) == 0:
+            err_widget.configure(border_color = 'red')
+            label.configure(text=' Name cannot be empty', text_color = 'red', image = self.error_img, compound = 'left')
+            submit.configure(state = 'disabled')
+            return False
+        
+        elif input.isdigit():
+            err_widget.configure(border_color = 'red')
+            label.configure(text=' Name cannot be a number ', text_color = 'red', image = self.error_img, compound = 'left')
+            submit.configure(state = 'disabled')
+
+            return False
+        else:
+                err_widget.configure(border_color = 'green')
+            # self.submit_button.configure(state = 'normal')
+                label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
+                return True
+    
+    def check_entry(self, check_list, target, err_widget, label, submit):
+        if len(target) == 0:
+                err_widget.configure(border_color = 'red')
+                label.configure(text = ' Entry cannot be NULL', text_color = 'red', image = self.error_img, compound = 'left')
+                submit.configure(state = 'disabled')
+                return False
+        
+        else:
+                for i in check_list:
+                    if target != i:
+                        check = True
+                    elif target == i:
+                        check = False
+                        break
+            
+                if check == False:
+                        err_widget.configure(border_color = 'red')
+                        label.configure(text = ' Duplicate entry', text_color = 'red', image = self.error_img, compound = 'left')
+                        submit.configure(state = 'disabled')
+
+                        return False
+
+                elif check == True:
+                        err_widget.configure(border_color = 'green')
+                        label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
+                        submit.configure(state = 'normal')
+                        return True
+
+        self.id_list.clear()
+        self.get_branch_id()
+
+    def get_branch_id(self):
+                self.id_list.clear()
+                pwd = 'rootadmin@24('
+                # self.connection1 = pymysql.connect(host = 'localhost', user='root', password=pwd, database= 'HospitalMS')
+                # self.connection1 = self.connection
+                self.cursor1 = self.connection.cursor()
+                # query = 'select distinct Branch_ID from Room'
+                self.cursor1.execute('select distinct Branch_ID from Room')
+                result = self.cursor1.fetchall()
+                self.id_list = [str(i[0]) for i in result]
+                # self.connection1.close()
+
+    def get_room_id(self, b_id):
+        self.room_list.clear()
+        self.db_dict = {}
+        for i in self.id_list:
+            self.cursor1.execute('select Room_no from Room where Branch_ID = %s', (i))
+            self.r1  = self.cursor1.fetchall()
+            for room in self.r1:
+                self.db_dict.setdefault(str(i), []).append(str(room[0]))
+
+
+        for key in self.db_dict.keys():
+            for value in self.db_dict[key]:
+                if key == b_id:
+                    self.room_list.append(str(value))
+
+        self.room_no_var.set(value= self.room_list[0])
+        self.room_no_entry.configure(values = self.room_list, variable = self.room_no_var)        
+
+    def room_details(self, capacity, available, err_widget, err_label, submit):
+       submit.configure(state = 'disabled')
+       
+       if available > capacity:
+           err_widget.configure(border_color = 'red')
+           err_label.configure(text = ' Availability cannot exceed capacity', text_color = 'red', image = self.error_img, compound = 'left')
+           submit.configure(state = 'disabled')
+           return False
+         
+       elif available <= capacity:
+           submit.configure(state = 'normal')
+           err_widget.configure(border_color = 'green')
+           err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+           return True
 
 
 class View(ctk.CTkToplevel):
     def __init__(self, connection):
         super().__init__()
+        self.connection = connection
+
+        self.update()
+
+        center_x = int((self.winfo_screenwidth() - 600) / 2)
+        center_y = int((self.winfo_screenheight() - 350) / 2)
+
+        self.geometry(f'700x350+{center_x}+{center_y}')
+        self.title('Admin View')
+        self.grab_set()
+        self.create_widgets()
+
+        self.view_frame = ctk.CTkFrame(self)
+
+    def create_widgets(self):
+        self.choice_frame = ctk.CTkFrame(self)
+        # self.view_frame = ctk.CTkFrame(self)
+
+        # Choice Tabs
+        self.tabs = ctk.CTkTabview(self.choice_frame)
+        self.hospital = self.tabs.add('Hospital')
+        self.employee = self.tabs.add('Employee')
+        self.room = self.tabs.add('Room')
+        self.patient = self.tabs.add('Patient')
+        self.patient_records = self.tabs.add('Patient Record')
+        self.treatment = self.tabs.add('Treatment')
+        self.cares_for = self.tabs.add('Assigned Nurse')
+
+        self.hospital_choice()
+
+        # Layout
+        self.choice_frame.pack(expand=True, fill='both')
+        self.tabs.pack(expand=True, fill='both')
+        print('Hi')
+
+    def hospital_choice(self):
+        # Define the grid
+        self.hospital.columnconfigure(0)
+        self.hospital.rowconfigure((0,1,2,3), weight=1, uniform='a')
+
+        # Variables
+        branch_id_var = ctk.StringVar()
+        branch_name_var = ctk.StringVar()
+        address_var = ctk.StringVar()
+
+
+        # Checkboxes
+        branch_id_check = ctk.CTkCheckBox(self.hospital, text='Branch ID', variable=branch_id_var, onvalue='Branch_ID', offvalue='')
+        branch_name_check = ctk.CTkCheckBox(self.hospital, text='Branch Name', variable=branch_name_var, onvalue='H_Name', offvalue='')
+        address_check = ctk.CTkCheckBox(self.hospital, text='Address', variable=address_var, onvalue='Address', offvalue='')
+
+        # var_list = [branch_id_var.get(), branch_name_var.get(), address_var.get()]
+
+        # Show button
+        self.show_button = ctk.CTkButton(self.hospital,
+                                         text='Show',
+                                         command=lambda e=None: self.fetch_records('Hospital', (branch_id_var.get(), branch_name_var.get(), address_var.get())))
+
+        # Layout
+        branch_id_check.grid(column=0, row=0, sticky='w')
+        branch_name_check.grid(column=0, row=1, sticky='w')
+        address_check.grid(column=0, row=2, sticky='w')
+
+        self.show_button.grid(column=0, row=3, sticky = 'ew')
+
+    def check_zero(self, var_list):
+        yes_count = 0
+        for var in var_list:
+            if var != '':
+                yes_count += 1
+
+        if yes_count == 0:
+            return True
+        else:
+            return False
+
+    def fetch_records(self, table, var_list):
+        yes_count = 0
+        for var in var_list:
+            if var != '':
+                yes_count += 1
+
+        cols = ''
+
+        for i in range(yes_count):
+            if i == 0:
+                cols += f'{var_list[i]}'
+            else:
+                cols += f', {var_list[i]}'
+
+        query = f"SELECT {cols} FROM {table};"
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        self.show_treeview(var_list, results)
+
+    def show_treeview(self, col_list, results):
+        style = ttk.Style()
+
+        # Configure the style for the Treeview widget
+        style.theme_use("clam")  # Change the theme to 'clam' (you can try other themes)
+        style.configure("Treeview",
+                        background="#c2c2c2",  # Background color
+                        foreground="black",    # Foreground color (text color)
+                        rowheight=25,          # Row height
+                        fieldbackground="#f0f0f0"  # Background color for fields
+                        )
+        style.map("Treeview",  # Map the Treeview widget with specific settings
+                background=[('selected', '#0078D7')],  # Selected item background color
+                foreground=[('selected', 'white')]    # Selected item text color
+                )
+        
+        table = ttk.Treeview(self.view_frame, columns=col_list, show='headings', style='Treeview')
+
+        for col in col_list:
+            table.heading(f'{col}', text=f'{col.title()}')
+
+        for row in results:
+            table.insert('', ctk.END, values=row)
+
+        table.pack(expand=True, fill='both')
+        self.view_frame.pack(expand=True, fill='both')
+        self.choice_frame.pack_forget()
 
 
 class Delete(ctk.CTkToplevel):

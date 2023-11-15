@@ -37,14 +37,17 @@ class frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color="transparent", border_color="cyan", border_width=1,  height= 300, width= 300)
 
+        self.user_img = ctk.CTkImage(Image.open('user.png'))
+        self.pwd_img = ctk.CTkImage(Image.open('pwd.png'))
+
         self.connection = pymysql.connect
 
         # Login Label
         login_label = ctk.CTkLabel(self, text="Login", font=("Helvetica", 20, "bold"), text_color="white") 
 
         # Username/Password labels
-        username_label = ctk.CTkLabel(self, text='Username', text_color='white', font=("Helvetica", 14))
-        pwd_label = ctk.CTkLabel(self, text='Password', text_color='white', font=("Helvetica", 14))
+        username_label = ctk.CTkLabel(self, text='  Username', text_color='white', font=("Helvetica", 14), image= self.user_img, compound= 'left')
+        pwd_label = ctk.CTkLabel(self, text='  Password', text_color='white', font=("Helvetica", 14), image= self.pwd_img, compound= 'left')
 
         # Entry widgets
         self.username_var = ctk.StringVar(value='root')
@@ -94,8 +97,8 @@ class frame(ctk.CTkFrame):
         # Placing Widgets
         login_label.place(relx=0.5, rely=0.1, anchor='center')
 
-        username_label.place(relx=0.30, rely=0.395, anchor='center')
-        pwd_label.place(relx=0.30, rely=0.595, anchor='center')
+        username_label.place(relx=0.24, rely=0.395, anchor='center')
+        pwd_label.place(relx=0.24, rely=0.595, anchor='center')
 
         self.username_entry.place(relx=0.65, rely=0.4,relheight = 0.1, relwidth=self.user_entry_rel_width, anchor='center')
         self.pswd_entry.place(relx=0.65, rely=0.6,relheight = 0.1, relwidth=self.pwd_entry_rel_width, anchor='center')

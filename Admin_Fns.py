@@ -773,8 +773,6 @@ class View(ctk.CTkToplevel):
         self.grab_set()
         self.create_widgets()
 
-        # self.view_frame = ctk.CTkFrame(self)
-
     def create_widgets(self):
         self.choice_frame = ctk.CTkFrame(self)
         self.view_frame = ctk.CTkFrame(self, fg_color='#f0f0f0')
@@ -1341,6 +1339,269 @@ class View(ctk.CTkToplevel):
 class Delete(ctk.CTkToplevel):
     def __init__(self, connection):
         super().__init__()
+        self.connection = connection
+
+        self.update()
+
+        center_x = int((self.winfo_screenwidth() - 1366) / 2)
+        center_y = int((self.winfo_screenheight() - 500) / 2)
+
+        self.geometry(f'1366x500+{center_x}+{center_y}')
+        self.title('Admin View')
+        self.grab_set()
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.del_frame = ctk.CTkFrame(self)
+        self.table_frame = ctk.CTkFrame(self)
+        
+        # Tabs
+        self.tabs = ctk.CTkTabview(self.del_frame, command=lambda e=None: self.choose_table())
+        self.employee = self.tabs.add('Employee')
+        self.room = self.tabs.add('Room')
+        self.patient = self.tabs.add('Patient')
+        self.patient_records = self.tabs.add('Patient Record')
+        self.treatment = self.tabs.add('Treatment')
+        self.cares_for = self.tabs.add('Assigned Nurse')
+
+        self.table = ttk.Treeview(self.table_frame)
+
+        self.employee_delete()
+        self.room_delete()
+        self.patient_delete()
+        self.patient_records_delete()
+        # self.treatment_delete()
+        # self.assigned_nurse_delete()
+
+        # Layout
+        self.del_frame.pack(expand=True, fill='both', side='left')
+        self.table_frame.pack(expand=True, fill='both', side='left')
+        self.tabs.pack(expand=True, fill='both')
+
+    def employee_delete(self):
+        # Define the grid
+        self.employee.columnconfigure(0, weight=1)
+        self.employee.columnconfigure(1, weight=2)
+        self.employee.rowconfigure((0,1), weight=1)
+
+        # Variable
+        emp_id_var = ctk.StringVar()
+
+        # Label
+        emp_id_label = ctk.CTkLabel(self.employee, text='Employee ID', font=('Helvetica', 14))
+
+        # Combobox
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT Emp_ID FROM Employee')
+        results = cursor.fetchall()
+        emp_id_list = []
+
+        for eid in results:
+            emp_id_list.append(str(eid[0]))
+
+        emp_id_combo = ctk.CTkComboBox(self.employee, values=emp_id_list, variable=emp_id_var)
+
+        # Delete button
+        del_button = ctk.CTkButton(self.employee, text='Delete', command=lambda: self.delete_record('Employee', f'Emp_ID = {emp_id_var.get()}'))
+
+        # Layout
+        emp_id_label.grid(column=0, row=0, sticky='e')
+        emp_id_combo.grid(column=1, row=0, sticky='ew', padx=50)
+
+        del_button.grid(column=0, row=1, columnspan=2)
+
+    def room_delete(self):
+        # Define the grid
+        self.room.columnconfigure(0, weight=1)
+        self.room.columnconfigure(1, weight=2)
+        self.room.rowconfigure((0,1), weight=1)
+
+        # Variable
+        room_no_var = ctk.StringVar()
+
+        # Label
+        room_no_label = ctk.CTkLabel(self.room, text='Room No', font=('Helvetica', 14))
+
+        # Combobox
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT Room_no FROM Room')
+        results = cursor.fetchall()
+        room_no_list = []
+
+        for rno in results:
+            room_no_list.append(str(rno[0]))
+
+        room_no_combo = ctk.CTkComboBox(self.room, values=room_no_list, variable=room_no_var)
+
+        # Delete button
+        del_button = ctk.CTkButton(self.room, text='Delete', command=lambda: self.delete_record('Room', f'Room_no = {room_no_var.get()}'))
+
+        # Layout
+        room_no_label.grid(column=0, row=0, sticky='e')
+        room_no_combo.grid(column=1, row=0, sticky='ew', padx=50)
+
+        del_button.grid(column=0, row=1, columnspan=2)
+
+    def patient_delete(self):
+        # Define the grid
+        self.patient.columnconfigure(0, weight=1)
+        self.patient.columnconfigure(1, weight=2)
+        self.patient.rowconfigure((0,1), weight=1)
+
+        # Variable
+        patient_id_var = ctk.StringVar()
+
+        # Label
+        patient_id_label = ctk.CTkLabel(self.patient, text='Patient ID', font=('Helvetica', 14))
+
+        # Combobox
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT Room_no FROM Room')
+        results = cursor.fetchall()
+        patient_id_list = []
+
+        for rno in results:
+            patient_id_list.append(str(rno[0]))
+
+        patient_id_combo = ctk.CTkComboBox(self.patient, values=patient_id_list, variable=patient_id_var)
+
+        # Delete button
+        del_button = ctk.CTkButton(self.patient, text='Delete', command=lambda: self.delete_record('Room', f'Room_no = {patient_id_var.get()}'))
+
+        # Layout
+        patient_id_label.grid(column=0, row=0, sticky='e')
+        patient_id_combo.grid(column=1, row=0, sticky='ew', padx=50)
+
+        del_button.grid(column=0, row=1, columnspan=2)
+
+    def patient_records_delete(self):
+        # Define the grid
+        self.patient_records.columnconfigure(0, weight=1)
+        self.patient_records.columnconfigure(1, weight=2)
+        self.patient_records.rowconfigure((0,1), weight=1)
+
+        # Variable
+        rec_no_var = ctk.StringVar()
+
+        # Label
+        rec_no_label = ctk.CTkLabel(self.patient_records, text='Record No', font=('Helvetica', 14))
+
+        # Combobox
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT Record_no FROM Patient_Records')
+        results = cursor.fetchall()
+        rec_no_list = []
+
+        for rec in results:
+            rec_no_list.append(str(rec[0]))
+
+        rec_no_combo = ctk.CTkComboBox(self.patient_records, values=rec_no_list, variable=rec_no_var)
+
+        # Delete button
+        del_button = ctk.CTkButton(self.patient_records, text='Delete', command=lambda: self.delete_record('Patient_Records', f'Record_no = {rec_no_var.get()}'))
+
+        # Layout
+        rec_no_label.grid(column=0, row=0, sticky='e')
+        rec_no_combo.grid(column=1, row=0, sticky='ew', padx=50)
+
+        del_button.grid(column=0, row=1, columnspan=2)
+
+    def treatment_delete(self):
+        # Define the grid
+        self.treatment.columnconfigure(0, weight=1)
+        self.treatment.columnconfigure(1, weight=2)
+        self.treatment.rowconfigure((0,1), weight=1)
+
+        # Variable
+        treatment_var = ctk.StringVar()
+
+        # Label
+        treatment_label = ctk.CTkLabel(self.treatment, text='Record No', font=('Helvetica', 14))
+
+        # Combobox
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT Record_no FROM Patient_Records')
+        results = cursor.fetchall()
+        treatment_list = []
+
+        for rec in results:
+            treatment_list.append(str(rec[0]))
+
+        treatment_combo = ctk.CTkComboBox(self.treatment, values=treatment_list, variable=treatment_var)
+
+        # Delete button
+        del_button = ctk.CTkButton(self.treatment, text='Delete', command=lambda: self.delete_record('Patient_Records', f'Record_no = {rec_no_var.get()}'))
+
+        # Layout
+        treatment_label.grid(column=0, row=0, sticky='e')
+        treatment_combo.grid(column=1, row=0, sticky='ew', padx=50)
+
+        del_button.grid(column=0, row=1, columnspan=2)
+
+    def assigned_nurse_delete(self):
+        pass
+
+    def choose_table(self):
+        if self.tabs.get() == 'Employee':
+            self.show_table(['Emp_ID', 'Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID'], 'Employee')
+
+        elif self.tabs.get() == 'Room':
+            self.show_table(['Room_no', 'Branch_ID', 'R_type', 'Capacity', 'Available'], 'Room')
+
+        elif self.tabs.get() == 'Patient':
+            self.show_table(['PID', 'P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no'], 'Patient')
+
+        elif self.tabs.get() == 'Patient Record':
+            self.show_table(['Record_no', 'PID', 'Treatment_Type', 'Date', 'Bill'], 'Patient_Records')
+
+        elif self.tabs.get() == 'Treatment':
+            self.show_table(['Emp_ID', 'PID', 'Date_Start', 'Date_end'], 'Treatment')
+
+        elif self.tabs.get() == 'Assigned Nurse':
+            self.show_table(['Emp_ID', 'PID', 'Shift'], 'Cares_for')
+
+    def show_table(self, cols, table):
+        self.table.delete(*self.table.get_children())
+        self.table.pack_forget()
+        style = ttk.Style()
+
+        # Configure the style for the Treeview widget
+        style.theme_use("clam")  # Change the theme to 'clam' (you can try other themes)
+        style.configure("Treeview",
+                        background="#c2c2c2",  # Background color
+                        foreground="black",    # Foreground color (text color)
+                        rowheight=25,          # Row height
+                        fieldbackground="#f0f0f0"  # Background color for fields
+                        )
+        style.map("Treeview",  # Map the Treeview widget with specific settings
+                background=[('selected', '#0078D7')],  # Selected item background color
+                foreground=[('selected', 'white')]    # Selected item text color
+                )
+        
+        self.table = ttk.Treeview(self.table_frame, columns=cols, show='headings', style='Treeview')
+
+
+        query = 'SELECT {} FROM {}'.format(', '.join(cols), table)
+
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        for col in cols:
+            self.table.heading(f'{col}', text=f'{col.title()}')
+
+        for row in results:
+            self.table.insert('', ctk.END, values=row)
+
+        # self.table_frame.pack(expand=True, fill='both')
+        self.table.pack(expand=True, fill='both')
+
+    def delete_record(self, table, value):
+        query = f'DELETE FROM {table} WHERE {value}'
+
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        self.connection.commit()
 
 
 class Update(ctk.CTkToplevel):

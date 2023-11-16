@@ -33,8 +33,6 @@ class App(ctk.CTkToplevel):
         right_frame.place(relx=0.69, rely=0, relwidth=0.31, relheight=1)
 
 
-
-
 class Left_Frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color='#0f0f0f')
@@ -118,11 +116,6 @@ class Right_Frame(ctk.CTkFrame):
         self.connection = connection
         self.cursor = self.connection.cursor()
         self.get_branch_id()
-
-
-        self.imgHolder = ctk.CTkCanvas(self, borderwidth= 0, highlightthickness = 0, bg = '#100E09')
-        self.imgHolder.pack(expand=True, fill='both')
-
 
         self.insert_img = ctk.CTkImage(Image.open('insert.png'))
         self.view_img = ctk.CTkImage(Image.open('view.png'))

@@ -812,7 +812,6 @@ class View(ctk.CTkToplevel):
         self.emp_frame.pack(expand=True, fill='both', side='left')
         self.doc_nurse_tabs.pack(expand=True, fill='both')
         self.doc_nurse_frame.pack(expand=True, fill='both', side='left')
-        print('Hi')
 
     def hospital_choice(self):
         # Define the grid

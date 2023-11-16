@@ -116,6 +116,7 @@ class Right_Frame(ctk.CTkFrame):
     def __init__(self, parent, connection):
         super().__init__(parent, fg_color='#171717', border_width=1, border_color='cyan')
         self.connection = connection
+        self.cursor = self.connection.cursor()
         self.get_branch_id()
 
 
@@ -178,13 +179,13 @@ class Right_Frame(ctk.CTkFrame):
             self.after(2, lambda: self.contract_btn(event, button, rely))
 
     def get_branch_id(self):
-                self.id_list = list()
-                
-                cursor = self.connection.cursor()
-                query = 'select distinct Branch_ID from Room'
-                cursor.execute(query)
-                result = cursor.fetchall()
-                self.id_list = [str(i[0]) for i in result]
+        self.id_list = list()
+        
+        cursor = self.connection.cursor()
+        query = 'select distinct Branch_ID from Room'
+        cursor.execute(query)
+        result = cursor.fetchall()
+        self.id_list = [str(i[0]) for i in result]
 
 
 class Right_User_Frame(Right_Frame):
@@ -200,6 +201,9 @@ class Right_User_Frame(Right_Frame):
 
         # Setup command for insertion
         self.insert_button.configure(command=self.user_insert)
+        self.view_button.configure(command=None)
+        self.view_button.configure(command=None)
+        self.view_button.configure(command=None)
 
 
 
@@ -287,8 +291,8 @@ class Right_User_Frame(Right_Frame):
         self.room_list.clear()
         self.db_dict = {}
         for i in self.id_list:
-            self.cursor1.execute('select Room_no from Room where Branch_ID = %s', (i))
-            self.r1  = self.cursor1.fetchall()
+            self.cursor.execute('select Room_no from Room where Branch_ID = %s', (i))
+            self.r1  = self.cursor.fetchall()
             for room in self.r1:
                 self.db_dict.setdefault(str(i), []).append(str(room[0]))
 

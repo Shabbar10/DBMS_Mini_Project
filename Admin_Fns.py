@@ -800,6 +800,8 @@ class View(ctk.CTkToplevel):
         self.employee_choice()
         self.doc_choice()
         self.nurse_choice()
+        self.room_choice()
+        self.patient_choice()
 
         # Layout
         self.choice_frame.pack(expand=True, fill='both')
@@ -1036,6 +1038,52 @@ class View(ctk.CTkToplevel):
         availability_entry.grid(column=1, row=4, sticky='ew')
 
         show_button.grid(column=0, row=4, columnspan=2)
+
+    def patient_choice(self):
+        # Define the grid
+        self.patient.columnconfigure(0, weight=1)
+        self.patient.columnconfigure(1, weight=2)
+        self.patient.rowconfigure((0,1,2,3,4,5,6,7), weight=1)
+
+        # Variables
+        patient_id_var = ctk.StringVar()
+        patient_name_var = ctk.StringVar()
+        dob_var = ctk.StringVar()
+        sex_var = ctk.StringVar()
+        address_var = ctk.StringVar()
+        branch_id_var = ctk.StringVar()
+        room_no_var = ctk.StringVar()
+
+        # Textvariables
+        patient_id_where = ctk.StringVar()
+        patient_name_where = ctk.StringVar()
+        dob_where = ctk.StringVar()
+        sex_where = ctk.StringVar()
+        address_where = ctk.StringVar()
+        branch_id_where = ctk.StringVar()
+        room_no_where = ctk.StringVar()
+
+        # Checkboxes
+        patient_id_check = ctk.CTkCheckBox(self.patient, text='', variable=patient_id_var, command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
+        patient_name_check = ctk.CTkCheckBox(self.patient, text='', variable=patient_name_var, command=lambda: self.toggle_entry(patient_name_var.get(), patient_name_entry))
+        dob_check = ctk.CTkCheckBox(self.patient, text='', variable=dob_var, command=lambda: self.toggle_entry(dob_var.get(), dob_entry))
+        sex_check = ctk.CTkCheckBox(self.patient, text='', variable=sex_var, command=lambda: self.toggle_entry(sex_var.get(), sex_entry))
+        address_check = ctk.CTkCheckBox(self.patient, text='', variable=address_var, command=lambda: self.toggle_entry(address_var.get(), address_entry))
+        branch_id_check = ctk.CTkCheckBox(self.patient, text='', variable=branch_id_var, command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
+        room_no_check = ctk.CTkCheckBox(self.patient, text='', variable=room_no_var, command=lambda: self.toggle_entry(room_no_var.get(), room_no_entry))
+
+        # Entries
+        patient_id_entry = ctk.CTkEntry(self.patient, textvariable=patient_id_where, state='disabled')
+        patient_name_entry = ctk.CTkEntry(self.patient, textvariable=patient_name_where, state='disabled')
+        dob_entry = ctk.CTkEntry(self.patient, textvariable=dob_where, state='disabled')
+        sex_entry = ctk.CTkEntry(self.patient, textvariable=sex_where, state='disabled')
+        address_entry = ctk.CTkEntry(self.patient, textvariable=address_where, state='disabled')
+        branch_id_entry = ctk.CTkEntry(self.patient, textvariable=branch_id_where, state='disabled')
+        room_no_entry = ctk.CTkEntry(self.patient, textvariable=room_no_where, state='disabled')
+
+        # Show button
+
+        # Layout
 
     def toggle_entry(self, where, entry):
         if where == '':

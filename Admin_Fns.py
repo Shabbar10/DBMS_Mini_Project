@@ -986,6 +986,56 @@ class View(ctk.CTkToplevel):
     def room_choice(self):
         # Define the grid
         self.room.columnconfigure(0, weight=1)
+        self.room.columnconfigure(1, weight=2)
+        self.room.rowconfigure((0,1,2,3,4,5), weight=1)
+
+        # Variables
+        room_no_var = ctk.StringVar()
+        branch_id_var = ctk.StringVar()
+        room_type_var = ctk.StringVar()
+        capacity_var = ctk.StringVar()
+        availability_var = ctk.StringVar()
+
+        # Textvariables
+        room_no_where = ctk.StringVar()
+        branch_id_where = ctk.StringVar()
+        room_type_where = ctk.StringVar()
+        capacity_where = ctk.StringVar()
+        availability_where = ctk.StringVar()
+
+        # Checkboxes
+        room_no_check = ctk.CTkCheckBox(self.room, text='Room No', variable=room_no_var, command=lambda: self.toggle_entry(room_no_var.get(), room_no_entry))
+        branch_id_check = ctk.CTkCheckBox(self.room, text='Branch ID', variable=branch_id_var, command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
+        room_type_check = ctk.CTkCheckBox(self.room, text='Room Type', variable=room_type_var, command=lambda: self.toggle_entry(room_type_var.get(), room_type_entry))
+        capacity_check = ctk.CTkCheckBox(self.room, text='Capacity', variable=capacity_var, command=lambda: self.toggle_entry(capacity_var.get(), capacity_entry))
+        availability_check = ctk.CTkCheckBox(self.room, text='Available', variable=availability_var, command=lambda: self.toggle_entry(availability_var.get(), availability_entry))
+
+        # Entries
+        room_no_entry = ctk.CTkEntry(self.room, textvariable=room_no_where, state='disabled')
+        branch_id_entry = ctk.CTkEntry(self.room, textvariable=branch_id_where, state='disabled')
+        room_type_entry = ctk.CTkEntry(self.room, textvariable=room_type_where, state='disabled')
+        capacity_entry = ctk.CTkEntry(self.room, textvariable=capacity_where, state='disabled')
+        availability_entry = ctk.CTkEntry(self.room, textvariable=availability_where, state='disabled')
+
+        # Show button
+        show_button = ctk.CTkButton(self.nurse,
+                                         text='Show',
+                                         command=lambda e=None: self.fetch_records('Room', (room_no_var.get(), branch_id_var.get(), room_type_var.get(), capacity_var.get(), availability_var.get()), (room_no_where.get(), branch_id_where.get(), room_type_where.get(), capacity_where.get(), availability_where.get())))
+
+        # Layout
+        room_no_check.grid(column=0, row=0, sticky='w')
+        branch_id_check.grid(column=0, row=1, sticky='w')
+        room_type_check.grid(column=0, row=2, sticky='w')
+        capacity_check.grid(column=0, row=3, sticky='w')
+        availability_check.grid(column=0, row=4, sticky='w')
+
+        room_no_entry.grid(column=1, row=0, sticky='ew')
+        branch_id_entry.grid(column=1, row=1, sticky='ew')
+        room_type_entry.grid(column=1, row=2, sticky='ew')
+        capacity_entry.grid(column=1, row=3, sticky='ew')
+        availability_entry.grid(column=1, row=4, sticky='ew')
+
+        show_button.grid(column=0, row=4, columnspan=2)
 
     def toggle_entry(self, where, entry):
         if where == '':

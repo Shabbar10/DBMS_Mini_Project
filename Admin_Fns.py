@@ -920,8 +920,8 @@ class View(ctk.CTkToplevel):
         qualification_where = ctk.StringVar()
 
         # Checkboxes
-        emp_id_check = ctk.CTkCheckBox(self.doc, text='Doctor ID', variable=emp_id_var, command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
-        qualification_check = ctk.CTkCheckBox(self.doc, text='Qualification', variable=emp_id_var, command=lambda: self.toggle_entry(qualification_var.get(), qualification_entry))
+        emp_id_check = ctk.CTkCheckBox(self.doc, text='Doctor ID', variable=emp_id_var, onvalue='Emp_ID', offvalue='' command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
+        qualification_check = ctk.CTkCheckBox(self.doc, text='Qualification', variable=emp_id_var, onvalue='Qualification', offvalue='' command=lambda: self.toggle_entry(qualification_var.get(), qualification_entry))
 
         # Entries
         emp_id_entry = ctk.CTkEntry(self.doc, textvariable=emp_id_where, state='disabled')
@@ -956,8 +956,8 @@ class View(ctk.CTkToplevel):
         role_where = ctk.StringVar()
 
         # Checkboxes
-        emp_id_check = ctk.CTkCheckBox(self.nurse, text='Nurse ID', variable=emp_id_var, command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
-        role_check = ctk.CTkCheckBox(self.nurse, text='Qualification', variable=emp_id_var, command=lambda: self.toggle_entry(role_var.get(), role_entry))
+        emp_id_check = ctk.CTkCheckBox(self.nurse, text='Nurse ID', variable=emp_id_var, onvalue='Emp_ID', offvalue='' command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
+        role_check = ctk.CTkCheckBox(self.nurse, text='Qualification', variable=emp_id_var, onvalue='Role', offvalue='' command=lambda: self.toggle_entry(role_var.get(), role_entry))
 
         # Entries
         emp_id_entry = ctk.CTkEntry(self.nurse, textvariable=emp_id_where, state='disabled')
@@ -998,11 +998,11 @@ class View(ctk.CTkToplevel):
         availability_where = ctk.StringVar()
 
         # Checkboxes
-        room_no_check = ctk.CTkCheckBox(self.room, text='Room No', variable=room_no_var, command=lambda: self.toggle_entry(room_no_var.get(), room_no_entry))
-        branch_id_check = ctk.CTkCheckBox(self.room, text='Branch ID', variable=branch_id_var, command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
-        room_type_check = ctk.CTkCheckBox(self.room, text='Room Type', variable=room_type_var, command=lambda: self.toggle_entry(room_type_var.get(), room_type_entry))
-        capacity_check = ctk.CTkCheckBox(self.room, text='Capacity', variable=capacity_var, command=lambda: self.toggle_entry(capacity_var.get(), capacity_entry))
-        availability_check = ctk.CTkCheckBox(self.room, text='Available', variable=availability_var, command=lambda: self.toggle_entry(availability_var.get(), availability_entry))
+        room_no_check = ctk.CTkCheckBox(self.room, text='Room No', variable=room_no_var, onvalue='Room_no', offvalue='', command=lambda: self.toggle_entry(room_no_var.get(), room_no_entry))
+        branch_id_check = ctk.CTkCheckBox(self.room, text='Branch ID', variable=branch_id_var, onvalue='Branch_ID', offvalue='', command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
+        room_type_check = ctk.CTkCheckBox(self.room, text='Room Type', variable=room_type_var, onvalue='R_Type', offvalue='', command=lambda: self.toggle_entry(room_type_var.get(), room_type_entry))
+        capacity_check = ctk.CTkCheckBox(self.room, text='Capacity', variable=capacity_var, onvalue='Capacity', offvalue='', command=lambda: self.toggle_entry(capacity_var.get(), capacity_entry))
+        availability_check = ctk.CTkCheckBox(self.room, text='Available', variable=availability_var, onvalue='Available', offvalue='', command=lambda: self.toggle_entry(availability_var.get(), availability_entry))
 
         # Entries
         room_no_entry = ctk.CTkEntry(self.room, textvariable=room_no_where, state='disabled')
@@ -1056,13 +1056,13 @@ class View(ctk.CTkToplevel):
         room_no_where = ctk.StringVar()
 
         # Checkboxes
-        patient_id_check = ctk.CTkCheckBox(self.patient, text='Patient ID', variable=patient_id_var, command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
-        patient_name_check = ctk.CTkCheckBox(self.patient, text='Patient Name', variable=patient_name_var, command=lambda: self.toggle_entry(patient_name_var.get(), patient_name_entry))
-        dob_check = ctk.CTkCheckBox(self.patient, text='DOB', variable=dob_var, command=lambda: self.toggle_entry(dob_var.get(), dob_entry))
-        sex_check = ctk.CTkCheckBox(self.patient, text='Sex', variable=sex_var, command=lambda: self.toggle_entry(sex_var.get(), sex_entry))
-        address_check = ctk.CTkCheckBox(self.patient, text='Address', variable=address_var, command=lambda: self.toggle_entry(address_var.get(), address_entry))
-        branch_id_check = ctk.CTkCheckBox(self.patient, text='Branch ID', variable=branch_id_var, command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
-        room_no_check = ctk.CTkCheckBox(self.patient, text='Room No', variable=room_no_var, command=lambda: self.toggle_entry(room_no_var.get(), room_no_entry))
+        patient_id_check = ctk.CTkCheckBox(self.patient, text='Patient ID', variable=patient_id_var, onvalue='PID', offvalue='', command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
+        patient_name_check = ctk.CTkCheckBox(self.patient, text='Patient Name', variable=patient_name_var, onvalue='P_Name', offvalue='', command=lambda: self.toggle_entry(patient_name_var.get(), patient_name_entry))
+        dob_check = ctk.CTkCheckBox(self.patient, text='DOB', variable=dob_var, onvalue='DOB', offvalue='', command=lambda: self.toggle_entry(dob_var.get(), dob_entry))
+        sex_check = ctk.CTkCheckBox(self.patient, text='Sex', variable=sex_var, onvalue='Sex', offvalue='', command=lambda: self.toggle_entry(sex_var.get(), sex_entry))
+        address_check = ctk.CTkCheckBox(self.patient, text='Address', variable=address_var, onvalue='Address', offvalue='', command=lambda: self.toggle_entry(address_var.get(), address_entry))
+        branch_id_check = ctk.CTkCheckBox(self.patient, text='Branch ID', variable=branch_id_var, onvalue='Branch_ID', offvalue='', command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
+        room_no_check = ctk.CTkCheckBox(self.patient, text='Room No', variable=room_no_var, onvalue='Room_no', offvalue='', command=lambda: self.toggle_entry(room_no_var.get(), room_no_entry))
 
         # Entries
         patient_id_entry = ctk.CTkEntry(self.patient, textvariable=patient_id_where, state='disabled')
@@ -1118,11 +1118,11 @@ class View(ctk.CTkToplevel):
         bill_where = ctk.StringVar()
 
         # Checkboxes
-        record_no_check = ctk.CTkCheckBox(self.patient_records, text='Record No', variable=record_no_var, command=lambda: self.toggle_entry(record_no_var.get(), record_no_entry))
-        patient_id_check = ctk.CTkCheckBox(self.patient_records, text='Patient ID', variable=patient_id_var, command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
-        treatment_check = ctk.CTkCheckBox(self.patient_records, text='Treatment', variable=treatment_var, command=lambda: self.toggle_entry(treatment_var.get(), treatment_entry))
-        date_check = ctk.CTkCheckBox(self.patient_records, text='Date', variable=date_var, command=lambda: self.toggle_entry(date_var.get(), date_entry))
-        bill_check = ctk.CTkCheckBox(self.patient_records, text='Bill', variable=bill_var, command=lambda: self.toggle_entry(bill_var.get(), bill_entry))
+        record_no_check = ctk.CTkCheckBox(self.patient_records, text='Record No', variable=record_no_var, onvalue='Record_no', offvalue='', command=lambda: self.toggle_entry(record_no_var.get(), record_no_entry))
+        patient_id_check = ctk.CTkCheckBox(self.patient_records, text='Patient ID', variable=patient_id_var, onvalue='PID', offvalue='', command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
+        treatment_check = ctk.CTkCheckBox(self.patient_records, text='Treatment', variable=treatment_var, onvalue='Treatment_Type', offvalue='', command=lambda: self.toggle_entry(treatment_var.get(), treatment_entry))
+        date_check = ctk.CTkCheckBox(self.patient_records, text='Date', variable=date_var, onvalue='Date', offvalue='', command=lambda: self.toggle_entry(date_var.get(), date_entry))
+        bill_check = ctk.CTkCheckBox(self.patient_records, text='Bill', variable=bill_var, onvalue='Bill', offvalue='', command=lambda: self.toggle_entry(bill_var.get(), bill_entry))
 
         # Entries
         record_no_entry = ctk.CTkEntry(self.patient_records, textvariable=record_no_where, state='disabled')
@@ -1170,10 +1170,10 @@ class View(ctk.CTkToplevel):
         date_end_where = ctk.StringVar()
 
         # Checkboxes
-        doc_id_check = ctk.CTkCheckBox(self.treatment, text='Doctor ID', variable=doc_id_var, command=lambda: self.toggle_entry(doc_id_var.get(), doc_id_entry))
-        patient_id_check = ctk.CTkCheckBox(self.treatment, text='Patient ID', variable=patient_id_var, command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
-        date_start_check = ctk.CTkCheckBox(self.treatment, text='Date Start', variable=date_start_var, command=lambda: self.toggle_entry(date_start_var.get(), date_start_entry))
-        date_end_check = ctk.CTkCheckBox(self.treatment, text='Date End', variable=date_end_var, command=lambda: self.toggle_entry(date_end_var.get(), date_end_entry))
+        doc_id_check = ctk.CTkCheckBox(self.treatment, text='Doctor ID', variable=doc_id_var, onvalue='Emp_ID', offvalue='', command=lambda: self.toggle_entry(doc_id_var.get(), doc_id_entry))
+        patient_id_check = ctk.CTkCheckBox(self.treatment, text='Patient ID', variable=patient_id_var, onvalue='PID', offvalue='', command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
+        date_start_check = ctk.CTkCheckBox(self.treatment, text='Date Start', variable=date_start_var, onvalue='Date_Start', offvalue='', command=lambda: self.toggle_entry(date_start_var.get(), date_start_entry))
+        date_end_check = ctk.CTkCheckBox(self.treatment, text='Date End', variable=date_end_var, onvalue='Date_end', offvalue='', command=lambda: self.toggle_entry(date_end_var.get(), date_end_entry))
 
         # Entries
         doc_id_entry = ctk.CTkEntry(self.treatment, textvariable=doc_id_where, state='disabled')
@@ -1216,9 +1216,9 @@ class View(ctk.CTkToplevel):
         shift_where = ctk.StringVar()
 
         # Checkboxes
-        nurse_id_check = ctk.CTkCheckBox(self.cares_for, text='Nurse ID', variable=nurse_id_var, command=lambda: self.toggle_entry(nurse_id_var.get(), nurse_id_entry))
-        patient_id_check = ctk.CTkCheckBox(self.cares_for, text='Patient ID', variable=patient_id_var, command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
-        shift_check = ctk.CTkCheckBox(self.cares_for, text='Shift', variable=shift_var, command=lambda: self.toggle_entry(shift_var.get(), shift_entry))
+        nurse_id_check = ctk.CTkCheckBox(self.cares_for, text='Nurse ID', variable=nurse_id_var, onvalue='Emp_ID', offvalue='', command=lambda: self.toggle_entry(nurse_id_var.get(), nurse_id_entry))
+        patient_id_check = ctk.CTkCheckBox(self.cares_for, text='Patient ID', variable=patient_id_var, onvalue='PID', offvalue='', command=lambda: self.toggle_entry(patient_id_var.get(), patient_id_entry))
+        shift_check = ctk.CTkCheckBox(self.cares_for, text='Shift', variable=shift_var, onvalue='Shift', offvalue='', command=lambda: self.toggle_entry(shift_var.get(), shift_entry))
 
         # Entries
         nurse_id_entry = ctk.CTkEntry(self.cares_for, textvariable=nurse_id_where, state='disabled')

@@ -50,13 +50,14 @@ class Left_Frame(ctk.CTkFrame):
 
         self.logout_button = ctk.CTkButton(self)
 
-        logo = ctk.CTkImage(Image.open('logo.jpg'), size=(100, 100))
+        logo = ctk.CTkImage(Image.open('logo.png'), size=(130, 130))
         self.logo_label = ctk.CTkLabel(self, text='', image=logo)
 
         # Layout
         self.mute_button.place(x=5, y=5)
         self.welcome_label.place(relx=0.5, rely=0.88, anchor='center')
-        self.logo_label.place(relx=0.985, rely=0.015, anchor='ne')
+        # self.logo_label.place(relx=0.985, rely=0.015, anchor='ne')
+        self.logo_label.place(relx=1, rely=0, anchor='ne')
         title_label.place(relx=0.5, rely=0.04, anchor='center')
 
     def play_music(self):

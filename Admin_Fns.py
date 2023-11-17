@@ -148,8 +148,8 @@ class Insert(ctk.CTkToplevel):
         for bid in results:
             branch_id_list.append(str(bid[0]))
 
-        mgr_id_combo = ctk.CTkComboBox(self.emp_frame, values=emp_id_list, variable=mgr_id_var)
-        branch_id_combo = ctk.CTkComboBox(self.emp_frame, values=branch_id_list, variable=branch_id_var)
+        mgr_id_combo = ctk.CTkComboBox(self.emp_frame, values=emp_id_list, variable=mgr_id_var, state = 'readonly')
+        branch_id_combo = ctk.CTkComboBox(self.emp_frame, values=branch_id_list, variable=branch_id_var, state = 'readonly')
 
         cursor.close()
 
@@ -205,7 +205,7 @@ class Insert(ctk.CTkToplevel):
         for eid in results:
             emp_id_list.append(str(eid[0]))
 
-        emp_id_combo = ctk.CTkComboBox(self.doc, values=emp_id_list, variable=emp_id_var)
+        emp_id_combo = ctk.CTkComboBox(self.doc, values=emp_id_list, variable=emp_id_var, state = 'readonly')
 
         cursor.close()
 
@@ -254,7 +254,7 @@ class Insert(ctk.CTkToplevel):
         for eid in results:
             emp_id_list.append(str(eid[0]))
 
-        emp_id_combo = ctk.CTkComboBox(self.nurse, values=emp_id_list, variable=emp_id_var)
+        emp_id_combo = ctk.CTkComboBox(self.nurse, values=emp_id_list, variable=emp_id_var, state = 'readonly')
 
         cursor.close()
 
@@ -312,7 +312,7 @@ class Insert(ctk.CTkToplevel):
         for bid in results:
             branch_id_list.append(str(bid[0]))
 
-        branch_id_combo = ctk.CTkComboBox(self.room, values=branch_id_list, variable=branch_id_var)
+        branch_id_combo = ctk.CTkComboBox(self.room, values=branch_id_list, variable=branch_id_var, state = 'readonly')
 
         cursor.close()
 
@@ -396,7 +396,7 @@ class Insert(ctk.CTkToplevel):
                 
             my_dict[bid] = room_no_list
 
-        branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var)
+        branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var, state = 'readonly')
 
         cursor.close()
 
@@ -457,7 +457,7 @@ class Insert(ctk.CTkToplevel):
         for pid in results:
             patient_id_list.append(str(pid[0]))
 
-        patient_id_combo = ctk.CTkComboBox(self.patient_records, values=patient_id_list, variable=pid_var)
+        patient_id_combo = ctk.CTkComboBox(self.patient_records, values=patient_id_list, variable=pid_var, state = 'readonly')
 
         cursor.close()
 
@@ -521,8 +521,8 @@ class Insert(ctk.CTkToplevel):
         for pid in results:
             patient_id_list.append(str(pid[0]))
 
-        doc_id_combo = ctk.CTkComboBox(self.treatment, values=doc_id_list, variable=doc_id_var)
-        patient_id_combo = ctk.CTkComboBox(self.treatment, values=patient_id_list, variable=patient_id_var)
+        doc_id_combo = ctk.CTkComboBox(self.treatment, values=doc_id_list, variable=doc_id_var, state = 'readonly')
+        patient_id_combo = ctk.CTkComboBox(self.treatment, values=patient_id_list, variable=patient_id_var, state = 'readonly')
 
         cursor.close()
 
@@ -580,9 +580,9 @@ class Insert(ctk.CTkToplevel):
         for pid in results:
             patient_id_list.append(str(pid[0]))
 
-        nurse_id_combo = ctk.CTkComboBox(self.cares_for, values=nurse_id_list, variable=nurse_id_var)
-        patient_id_combo = ctk.CTkComboBox(self.cares_for, values=patient_id_list, variable=patient_id_var)
-        shift_combo = ctk.CTkComboBox(self.cares_for, values=['Morning', 'Evening'], variable=shift_var)
+        nurse_id_combo = ctk.CTkComboBox(self.cares_for, values=nurse_id_list, variable=nurse_id_var, state = 'readonly')
+        patient_id_combo = ctk.CTkComboBox(self.cares_for, values=patient_id_list, variable=patient_id_var, state = 'readonly')
+        shift_combo = ctk.CTkComboBox(self.cares_for, values=['Morning', 'Evening'], variable=shift_var, state = 'readonly')
 
         cursor.close()
 
@@ -1012,7 +1012,7 @@ class View(ctk.CTkToplevel):
         availability_entry = ctk.CTkEntry(self.room, textvariable=availability_where, state='disabled')
 
         # Show button
-        show_button = ctk.CTkButton(self.nurse,
+        show_button = ctk.CTkButton(self.room,
                                          text='Show',
                                          command=lambda e=None: self.fetch_records('Room', (room_no_var.get(), branch_id_var.get(), room_type_var.get(), capacity_var.get(), availability_var.get()), (room_no_where.get(), branch_id_where.get(), room_type_where.get(), capacity_where.get(), availability_where.get())))
 
@@ -1029,7 +1029,7 @@ class View(ctk.CTkToplevel):
         capacity_entry.grid(column=1, row=3, sticky='ew', padx=50)
         availability_entry.grid(column=1, row=4, sticky='ew', padx=50)
 
-        show_button.grid(column=0, row=4, columnspan=2)
+        show_button.grid(column=0, row=5, columnspan=2)
 
     def patient_choice(self):
         # Define the grid

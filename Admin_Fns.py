@@ -1443,8 +1443,8 @@ class Delete(ctk.CTkToplevel):
         for rno in results:
             room_no_list.append(str(rno[0]))
 
-        branch_id_combo = ctk.CTkComboBox(self.room, values=branch_id_list, variable=branch_id_var)
-        room_no_combo = ctk.CTkComboBox(self.room, values=room_no_list, variable=room_no_var)
+        branch_id_combo = ctk.CTkComboBox(self.room, values=self.branch_id_list, variable=self.branch_id_var, command= lambda x : self.get_room_id(self.branch_id_var.get(), room_no_combo))
+        room_no_combo = ctk.CTkComboBox(self.room, values=self.room_no_list, variable=self.room_no_var)
 
         # Delete button
         del_button = ctk.CTkButton(self.room, text='Delete', command=lambda: self.delete_record('Room', ['Room_no', 'Branch_ID', 'R_type', 'Capacity', 'Available'], f'Room_no = {room_no_var.get()} AND Branch_ID = {branch_id_var.get()}'))
@@ -1538,12 +1538,7 @@ class Delete(ctk.CTkToplevel):
 
         # Combobox
         cursor = self.connection.cursor()
-        cursor.execute('SELECT Emp_ID FROM Treatment')
-        results = cursor.fetchall()
-        doc_id_list = []
-
-        for did in results:
-            doc_id_list.append(str(did[0]))
+        self.doc_id_list = []
 
         cursor.execute('SELECT PID FROM Treatment')
         results = cursor.fetchall()
@@ -1552,18 +1547,18 @@ class Delete(ctk.CTkToplevel):
         for pid in results:
             patient_id_list.append(str(pid[0]))
 
-        doc_id_combo = ctk.CTkComboBox(self.treatment, values=doc_id_list, variable=doc_id_var)
-        patient_id_combo = ctk.CTkComboBox(self.treatment, values=patient_id_list, variable=patient_id_var)
+        doc_id_combo = ctk.CTkComboBox(self.treatment, values=self.doc_id_list, variable=doc_id_var)
+        patient_id_combo = ctk.CTkComboBox(self.treatment, values=patient_id_list, variable=patient_id_var, command= lambda : self.get_doc_id(patient_id_var.get()))
 
         # Delete button
         del_button = ctk.CTkButton(self.treatment, text='Delete', command=lambda: self.delete_record('Treatment', ['Emp_ID', 'PID', 'Date_Start', 'Date_end'], f'Emp_ID = {doc_id_var.get()} AND PID = {patient_id_var.get()}'))
 
         # Layout
-        doc_id_label.grid(column=0, row=0, sticky='e')
-        patient_id_label.grid(column=0, row=1, sticky='e')
+        patient_id_label.grid(column=0, row=0, sticky='e')
+        doc_id_label.grid(column=0, row=1, sticky='e')
 
-        doc_id_combo.grid(column=1, row=0, sticky='ew', padx=50)
-        patient_id_combo.grid(column=1, row=1, sticky='ew', padx=50)
+        patient_id_combo.grid(column=1, row=0, sticky='ew', padx=50)
+        doc_id_combo.grid(column=1, row=1, sticky='ew', padx=50)
 
         del_button.grid(column=0, row=2, columnspan=2)
 
@@ -1675,6 +1670,78 @@ class Delete(ctk.CTkToplevel):
 
         # self.show_table(['Record_no', 'PID', 'Treatment_Type', 'Date', 'Bill'], 'Patient_Records')
         self.show_table(cols, table)
+
+    def check_entry(self, check_list, target, err_widget, label, submit):
+        if len(target) == 0:
+                err_widget.configure(border_color = 'red')
+                label.configure(text = ' Entry cannot be NULL', text_color = 'red', image = self.error_img, compound = 'left')
+                submit.configure(state = 'disabled')
+                return False
+        
+        else:
+                for i in check_list:
+                    if target != i:
+                        check = True
+                    elif target == i:
+                        check = False
+                        break
+            
+                if check == False:
+                        err_widget.configure(border_color = 'red')
+                        label.configure(text = ' Duplicate entry', text_color = 'red', image = self.error_img, compound = 'left')
+                        submit.configure(state = 'disabled')
+
+                        return False
+
+                elif check == True:
+                        err_widget.configure(border_color = 'green')
+                        label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
+                        submit.configure(state = 'normal')
+                        return True
+
+        self.id_list.clear()
+        self.get_branch_id()
+
+    def get_room_id(self, b_id, combo_widget):
+        self.room_no_list.clear()
+        self.db_dict = {}
+        for i in self.branch_id_list:
+            cursor1 = self.connection.cursor()
+            cursor1.execute('select Room_no from Room where Branch_ID = %s', (i))
+
+            self.r1  = cursor1.fetchall()
+            for room in self.r1:
+                self.db_dict.setdefault(str(i), []).append(str(room[0]))
+
+
+        for key in self.db_dict.keys():
+            for value in self.db_dict[key]:
+                if key == b_id:
+                    self.room_no_list.append(str(value))
+
+        self.room_no_var.set(value= self.room_no_list[0])
+        # self.room_no_entry.configure(values = self.room_list, variable = self.room_no_var)
+        combo_widget.configure(values = self.room_no_list, variable = self.room_no_var)
+
+    def get_doc_id(self, pid):
+        self.doc_id_list.clear()
+        cursor3 = self.connection.cursor()
+        cursor3.execute(f'SELECT Emp_ID FROM Treatment where PID = {pid}')
+        results = cursor3.fetchall()
+        # doc_id_list = []
+
+        for did in results:
+            self.doc_id_list.append(str(did[0]))
+    
+    def get_nurse_id(self, pid):
+        self.nurse_id_list.clear()
+        cursor2 = self.connection.cursor()
+        cursor2.execute(f'SELECT Emp_ID FROM Cares_for where PID = {pid}')
+        results = cursor2.fetchall()
+        # doc_id_list = []
+
+        for did in results:
+            self.nurse_id_list.append(str(did[0]))
 
 
 class Update(ctk.CTkToplevel):

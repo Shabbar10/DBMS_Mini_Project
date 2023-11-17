@@ -714,15 +714,10 @@ class Insert(ctk.CTkToplevel):
 
     def get_branch_id(self):
                 self.id_list.clear()
-                pwd = 'rootadmin@24('
-                # self.connection1 = pymysql.connect(host = 'localhost', user='root', password=pwd, database= 'HospitalMS')
-                # self.connection1 = self.connection
                 self.cursor1 = self.connection.cursor()
-                # query = 'select distinct Branch_ID from Room'
                 self.cursor1.execute('select distinct Branch_ID from Room')
                 result = self.cursor1.fetchall()
                 self.id_list = [str(i[0]) for i in result]
-                # self.connection1.close()
 
     def get_room_id(self, b_id):
         self.room_list.clear()
@@ -1370,7 +1365,7 @@ class Delete(ctk.CTkToplevel):
         self.room_delete()
         self.patient_delete()
         self.patient_records_delete()
-        # self.treatment_delete()
+        self.treatment_delete()
         # self.assigned_nurse_delete()
 
         # Layout
@@ -1402,7 +1397,7 @@ class Delete(ctk.CTkToplevel):
         emp_id_combo = ctk.CTkComboBox(self.employee, values=emp_id_list, variable=emp_id_var)
 
         # Delete button
-        del_button = ctk.CTkButton(self.employee, text='Delete', command=lambda: self.delete_record('Employee', f'Emp_ID = {emp_id_var.get()}'))
+        del_button = ctk.CTkButton(self.employee, text='Delete', command=lambda: self.delete_record('Employee', ['Emp_ID', 'Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID'], f'Emp_ID = {emp_id_var.get()}'))
 
         # Layout
         emp_id_label.grid(column=0, row=0, sticky='e')
@@ -1414,16 +1409,26 @@ class Delete(ctk.CTkToplevel):
         # Define the grid
         self.room.columnconfigure(0, weight=1)
         self.room.columnconfigure(1, weight=2)
-        self.room.rowconfigure((0,1), weight=1)
+        self.room.rowconfigure((0,1,2), weight=1)
 
         # Variable
+        branch_id_var = ctk.StringVar()
         room_no_var = ctk.StringVar()
 
         # Label
+        branch_id_label = ctk.CTkLabel(self.room, text='Branch ID', font=('Helvetica', 14))
         room_no_label = ctk.CTkLabel(self.room, text='Room No', font=('Helvetica', 14))
 
         # Combobox
         cursor = self.connection.cursor()
+
+        cursor.execute('SELECT DISTINCT Branch_ID FROM Room')
+        results = cursor.fetchall()
+        branch_id_list = []
+
+        for bid in results:
+            branch_id_list.append(str(bid[0]))
+
         cursor.execute('SELECT Room_no FROM Room')
         results = cursor.fetchall()
         room_no_list = []
@@ -1431,16 +1436,20 @@ class Delete(ctk.CTkToplevel):
         for rno in results:
             room_no_list.append(str(rno[0]))
 
+        branch_id_combo = ctk.CTkComboBox(self.room, values=branch_id_list, variable=branch_id_var)
         room_no_combo = ctk.CTkComboBox(self.room, values=room_no_list, variable=room_no_var)
 
         # Delete button
-        del_button = ctk.CTkButton(self.room, text='Delete', command=lambda: self.delete_record('Room', f'Room_no = {room_no_var.get()}'))
+        del_button = ctk.CTkButton(self.room, text='Delete', command=lambda: self.delete_record('Room', ['Room_no', 'Branch_ID', 'R_type', 'Capacity', 'Available'], f'Room_no = {room_no_var.get()} AND Branch_ID = {branch_id_var.get()}'))
 
         # Layout
-        room_no_label.grid(column=0, row=0, sticky='e')
-        room_no_combo.grid(column=1, row=0, sticky='ew', padx=50)
+        branch_id_label.grid(column=0, row=0, sticky='e')
+        room_no_label.grid(column=0, row=1, sticky='e')
 
-        del_button.grid(column=0, row=1, columnspan=2)
+        branch_id_combo.grid(column=1, row=0, sticky='ew', padx=50)
+        room_no_combo.grid(column=1, row=1, sticky='ew', padx=50)
+
+        del_button.grid(column=0, row=2, columnspan=2)
 
     def patient_delete(self):
         # Define the grid
@@ -1466,7 +1475,7 @@ class Delete(ctk.CTkToplevel):
         patient_id_combo = ctk.CTkComboBox(self.patient, values=patient_id_list, variable=patient_id_var)
 
         # Delete button
-        del_button = ctk.CTkButton(self.patient, text='Delete', command=lambda: self.delete_record('Room', f'Room_no = {patient_id_var.get()}'))
+        del_button = ctk.CTkButton(self.patient, text='Delete', command=lambda: self.delete_record('Room', ['PID', 'P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no'], f'Room_no = {patient_id_var.get()}'))
 
         # Layout
         patient_id_label.grid(column=0, row=0, sticky='e')
@@ -1498,7 +1507,7 @@ class Delete(ctk.CTkToplevel):
         rec_no_combo = ctk.CTkComboBox(self.patient_records, values=rec_no_list, variable=rec_no_var)
 
         # Delete button
-        del_button = ctk.CTkButton(self.patient_records, text='Delete', command=lambda: self.delete_record('Patient_Records', f'Record_no = {rec_no_var.get()}'))
+        del_button = ctk.CTkButton(self.patient_records, text='Delete', command=lambda: self.delete_record('Patient_Records', ['Record_no', 'PID', 'Treatment_Type', 'Date', 'Bill'], f'Record_no = {rec_no_var.get()}'))
 
         # Layout
         rec_no_label.grid(column=0, row=0, sticky='e')
@@ -1510,33 +1519,46 @@ class Delete(ctk.CTkToplevel):
         # Define the grid
         self.treatment.columnconfigure(0, weight=1)
         self.treatment.columnconfigure(1, weight=2)
-        self.treatment.rowconfigure((0,1), weight=1)
+        self.treatment.rowconfigure((0,1,2), weight=1)
 
         # Variable
-        treatment_var = ctk.StringVar()
+        doc_id_var = ctk.StringVar()
+        patient_id_var = ctk.StringVar()
 
         # Label
-        treatment_label = ctk.CTkLabel(self.treatment, text='Record No', font=('Helvetica', 14))
+        doc_id_label = ctk.CTkLabel(self.treatment, text='Doctor ID', font=('Helvetica', 14))
+        patient_id_label = ctk.CTkLabel(self.treatment, text='Patient ID', font=('Helvetica', 14))
 
         # Combobox
         cursor = self.connection.cursor()
-        cursor.execute('SELECT Record_no FROM Patient_Records')
+        cursor.execute('SELECT Emp_ID FROM Treatment')
         results = cursor.fetchall()
-        treatment_list = []
+        doc_id_list = []
 
-        for rec in results:
-            treatment_list.append(str(rec[0]))
+        for did in results:
+            doc_id_list.append(str(did[0]))
 
-        treatment_combo = ctk.CTkComboBox(self.treatment, values=treatment_list, variable=treatment_var)
+        cursor.execute('SELECT PID FROM Treatment')
+        results = cursor.fetchall()
+        patient_id_list = []
+
+        for pid in results:
+            patient_id_list.append(str(pid[0]))
+
+        doc_id_combo = ctk.CTkComboBox(self.treatment, values=doc_id_list, variable=doc_id_var)
+        patient_id_combo = ctk.CTkComboBox(self.treatment, values=patient_id_list, variable=patient_id_var)
 
         # Delete button
-        del_button = ctk.CTkButton(self.treatment, text='Delete', command=lambda: self.delete_record('Patient_Records', f'Record_no = {rec_no_var.get()}'))
+        del_button = ctk.CTkButton(self.treatment, text='Delete', command=lambda: self.delete_record('Treatment', ['Emp_ID', 'PID', 'Date_Start', 'Date_end'], f'Emp_ID = {doc_id_var.get()} AND PID = {patient_id_var.get()}'))
 
         # Layout
-        treatment_label.grid(column=0, row=0, sticky='e')
-        treatment_combo.grid(column=1, row=0, sticky='ew', padx=50)
+        doc_id_label.grid(column=0, row=0, sticky='e')
+        patient_id_label.grid(column=0, row=1, sticky='e')
 
-        del_button.grid(column=0, row=1, columnspan=2)
+        doc_id_combo.grid(column=1, row=0, sticky='ew', padx=50)
+        patient_id_combo.grid(column=1, row=1, sticky='ew', padx=50)
+
+        del_button.grid(column=0, row=2, columnspan=2)
 
     def assigned_nurse_delete(self):
         pass
@@ -1580,7 +1602,6 @@ class Delete(ctk.CTkToplevel):
         
         self.table = ttk.Treeview(self.table_frame, columns=cols, show='headings', style='Treeview')
 
-
         query = 'SELECT {} FROM {}'.format(', '.join(cols), table)
 
         cursor = self.connection.cursor()
@@ -1596,12 +1617,15 @@ class Delete(ctk.CTkToplevel):
         # self.table_frame.pack(expand=True, fill='both')
         self.table.pack(expand=True, fill='both')
 
-    def delete_record(self, table, value):
+    def delete_record(self, table, cols, value):
         query = f'DELETE FROM {table} WHERE {value}'
 
         cursor = self.connection.cursor()
         cursor.execute(query)
         self.connection.commit()
+
+        # self.show_table(['Record_no', 'PID', 'Treatment_Type', 'Date', 'Bill'], 'Patient_Records')
+        self.show_table(cols, table)
 
 
 class Update(ctk.CTkToplevel):

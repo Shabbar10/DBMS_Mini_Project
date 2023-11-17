@@ -920,8 +920,8 @@ class View(ctk.CTkToplevel):
         qualification_where = ctk.StringVar()
 
         # Checkboxes
-        emp_id_check = ctk.CTkCheckBox(self.doc, text='Doctor ID', variable=emp_id_var, onvalue='Emp_ID', offvalue='' command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
-        qualification_check = ctk.CTkCheckBox(self.doc, text='Qualification', variable=emp_id_var, onvalue='Qualification', offvalue='' command=lambda: self.toggle_entry(qualification_var.get(), qualification_entry))
+        emp_id_check = ctk.CTkCheckBox(self.doc, text='Doctor ID', variable=emp_id_var, onvalue='Emp_ID', offvalue='', command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
+        qualification_check = ctk.CTkCheckBox(self.doc, text='Qualification', variable=emp_id_var, onvalue='Qualification', offvalue='', command=lambda: self.toggle_entry(qualification_var.get(), qualification_entry))
 
         # Entries
         emp_id_entry = ctk.CTkEntry(self.doc, textvariable=emp_id_where, state='disabled')
@@ -956,8 +956,8 @@ class View(ctk.CTkToplevel):
         role_where = ctk.StringVar()
 
         # Checkboxes
-        emp_id_check = ctk.CTkCheckBox(self.nurse, text='Nurse ID', variable=emp_id_var, onvalue='Emp_ID', offvalue='' command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
-        role_check = ctk.CTkCheckBox(self.nurse, text='Qualification', variable=emp_id_var, onvalue='Role', offvalue='' command=lambda: self.toggle_entry(role_var.get(), role_entry))
+        emp_id_check = ctk.CTkCheckBox(self.nurse, text='Nurse ID', variable=emp_id_var, onvalue='Emp_ID', offvalue='', command=lambda: self.toggle_entry(emp_id_var.get(), emp_id_entry))
+        role_check = ctk.CTkCheckBox(self.nurse, text='Qualification', variable=emp_id_var, onvalue='Role', offvalue='', command=lambda: self.toggle_entry(role_var.get(), role_entry))
 
         # Entries
         emp_id_entry = ctk.CTkEntry(self.nurse, textvariable=emp_id_where, state='disabled')

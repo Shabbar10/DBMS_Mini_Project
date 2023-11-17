@@ -464,7 +464,7 @@ class Insert(ctk.CTkToplevel):
         # Submit button
         submit_button = ctk.CTkButton(self.patient_records, 
                                       text='Submit', 
-                                      command=lambda: self.commit_data('Patient_Records', ('PID', 'Treatment_Type', 'Date', 'Bill'), (int(pid_var.get()), treatment_var.get()), date_var.get(), int(bill_var.get())), 
+                                      command=lambda e=None: self.commit_data('Patient_Records', ['PID', 'Treatment_Type', 'Date', 'Bill'], [int(pid_var.get()), treatment_var.get(), date_var.get(), int(bill_var.get())]),
                                       fg_color='#144870', 
                                       text_color='black', 
                                       hover_color='cyan')
@@ -619,8 +619,6 @@ class Insert(ctk.CTkToplevel):
 
         cursor.execute(query, values)
         self.connection.commit()
-
-        self.update_comboboxes()
 
     def change_size(self, event):
         center_x = int((self.winfo_screenwidth() - 700) / 2)

@@ -1267,13 +1267,21 @@ class View(ctk.CTkToplevel):
             if var != '':
                 yes_count += 1
 
-        cols = ''
+        # cols = ''
+        cols = []
 
-        for i in range(yes_count):
-            if i == 0:
-                cols += f'{var_list[i]}'
-            else:
-                cols += f', {var_list[i]}'
+        index = 0
+        while yes_count > 0:
+            if var_list[index] != '':
+                yes_count -= 1
+                cols.append(var_list[index])
+            index += 1
+
+        # for i in range(yes_count):
+        #     if i == 0:
+        #         cols += f'{var_list[i]}'
+        #     else:
+        #         cols += f', {var_list[i]}'
 
         conditions = []
         for i in range(yes_count):
@@ -1281,7 +1289,7 @@ class View(ctk.CTkToplevel):
                 actual = f'{var_list[i]} {where_list[i]}'
                 conditions.append(actual)
 
-        query = f"SELECT {cols} FROM {table}"
+        query = "SELECT {} FROM {}".format(', '.join(cols), table)
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
@@ -1290,7 +1298,7 @@ class View(ctk.CTkToplevel):
         cursor.execute(query)
         results = cursor.fetchall()
 
-        self.show_treeview(var_list, results)
+        self.show_treeview(cols, results)
 
     def show_treeview(self, col_list, results):
         style = ttk.Style()

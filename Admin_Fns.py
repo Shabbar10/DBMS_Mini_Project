@@ -1,6 +1,5 @@
 import customtkinter as ctk
 from tkinter import ttk
-# import ttkbootstrap as ttk
 from PIL import Image
 
 class Insert(ctk.CTkToplevel):
@@ -1446,6 +1445,8 @@ class Delete(ctk.CTkToplevel):
 
         branch_id_combo = ctk.CTkComboBox(self.room, values=self.branch_id_list, variable=self.branch_id_var, command= lambda x : self.get_room_id(self.branch_id_var.get(), room_no_combo))
         room_no_combo = ctk.CTkComboBox(self.room, values=self.room_no_list, variable=self.room_no_var)
+        branch_id_combo = ctk.CTkComboBox(self.room, values=self.branch_id_list, variable=self.branch_id_var, command= lambda x : self.get_room_id(self.branch_id_var.get(), room_no_combo))
+        room_no_combo = ctk.CTkComboBox(self.room, values=self.room_no_list, variable=self.room_no_var)
 
         # Delete button
         del_button = ctk.CTkButton(self.room, text='Delete', command=lambda: self.delete_record('Room', ['Room_no', 'Branch_ID', 'R_type', 'Capacity', 'Available'], f'Room_no = {self.room_no_var.get()} AND Branch_ID = {self.branch_id_var.get()}'))
@@ -1561,11 +1562,11 @@ class Delete(ctk.CTkToplevel):
         del_button = ctk.CTkButton(self.treatment, text='Delete', command=lambda: self.delete_record('Treatment', ['Emp_ID', 'PID', 'Date_Start', 'Date_end'], f'Emp_ID = {doc_id_var.get()} AND PID = {patient_id_var.get()}'))
 
         # Layout
-        doc_id_label.grid(column=0, row=1, sticky='e')
         patient_id_label.grid(column=0, row=0, sticky='e')
+        doc_id_label.grid(column=0, row=1, sticky='e')
 
-        doc_id_combo.grid(column=1, row=1, sticky='ew', padx=50)
         patient_id_combo.grid(column=1, row=0, sticky='ew', padx=50)
+        doc_id_combo.grid(column=1, row=1, sticky='ew', padx=50)
 
         del_button.grid(column=0, row=2, columnspan=2)
 
@@ -1749,6 +1750,7 @@ class Delete(ctk.CTkToplevel):
 
         for did in results:
             self.nurse_id_list.append(str(did[0]))
+
 
 class Update(ctk.CTkToplevel):
     def __init__(self, connection):

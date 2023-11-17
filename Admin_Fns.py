@@ -1366,7 +1366,7 @@ class Delete(ctk.CTkToplevel):
         self.patient_delete()
         self.patient_records_delete()
         self.treatment_delete()
-        # self.assigned_nurse_delete()
+        self.assigned_nurse_delete()
 
         # Layout
         self.del_frame.pack(expand=True, fill='both', side='left')
@@ -1561,7 +1561,49 @@ class Delete(ctk.CTkToplevel):
         del_button.grid(column=0, row=2, columnspan=2)
 
     def assigned_nurse_delete(self):
-        pass
+        # Define the grid
+        self.cares_for.columnconfigure(0, weight=1)
+        self.cares_for.columnconfigure(1, weight=2)
+        self.cares_for.rowconfigure((0,1,2), weight=1)
+
+        # Variable
+        nurse_id_var = ctk.StringVar()
+        patient_id_var = ctk.StringVar()
+
+        # Label
+        nurse_id_label = ctk.CTkLabel(self.cares_for, text='Nurse ID', font=('Helvetica', 14))
+        patient_id_label = ctk.CTkLabel(self.cares_for, text='Patient ID', font=('Helvetica', 14))
+
+        # Combobox
+        cursor = self.connection.cursor()
+        cursor.execute('SELECT Emp_ID FROM Cares_for')
+        results = cursor.fetchall()
+        nurse_id_list = []
+
+        for nid in results:
+            nurse_id_list.append(str(nid[0]))
+
+        cursor.execute('SELECT PID FROM Cares_for')
+        results = cursor.fetchall()
+        patient_id_list = []
+
+        for pid in results:
+            patient_id_list.append(str(pid[0]))
+
+        nurse_id_combo = ctk.CTkComboBox(self.cares_for, values=nurse_id_list, variable=nurse_id_var)
+        patient_id_combo = ctk.CTkComboBox(self.cares_for, values=patient_id_list, variable=patient_id_var)
+
+        # Delete button
+        del_button = ctk.CTkButton(self.cares_for, text='Delete', command=lambda: self.delete_record('Cares_for', ['Emp_ID', 'PID', 'Shift'], f'Emp_ID = {nurse_id_var.get()} AND PID = {patient_id_var.get()}'))
+
+        # Layout
+        nurse_id_label.grid(column=0, row=0, sticky='e')
+        patient_id_label.grid(column=0, row=1, sticky='e')
+
+        nurse_id_combo.grid(column=1, row=0, sticky='ew', padx=50)
+        patient_id_combo.grid(column=1, row=1, sticky='ew', padx=50)
+
+        del_button.grid(column=0, row=2, columnspan=2)
 
     def choose_table(self):
         if self.tabs.get() == 'Employee':

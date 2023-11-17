@@ -247,7 +247,7 @@ class Right_User_Frame(Right_Frame):
         self.room_no_var = ctk.StringVar()
 
         # Entries
-        self.p_name_entry = ctk.CTkEntry(frame, textvariable=self.p_name_var, validatecommand = self.not_null, validate = "focusout")
+        self.p_name_entry = ctk.CTkEntry(frame, textvariable=self.p_name_var, validatecommand = self.not_null, validate = "focus")
         self.dob_entry = ctk.CTkEntry(frame, textvariable=self.dob_var)
         self.sex_entry = ctk.CTkComboBox(frame, values= self.gender_list, variable=self.sex_var, state='readonly')
         self.address_textbox = ctk.CTkTextbox(frame, font=('Helvetica', 14), fg_color='#343638', height=30, border_color='#565b5e', border_width=2, activate_scrollbars=False)
@@ -255,7 +255,7 @@ class Right_User_Frame(Right_Frame):
          
         self.branch_id_entry = ctk.CTkComboBox(frame, values= self.id_list, variable= self.branch_id_var, state= 'readonly', command= lambda x : self.get_room_id(self.branch_id_var.get()))
 
-        self.room_no_entry = ctk.CTkComboBox(frame, values= self.room_list, variable=self.room_no_var)
+        self.room_no_entry = ctk.CTkComboBox(frame, values= self.room_list, variable=self.room_no_var, state = 'readonly')
 
         # Layout
         self.p_name_label.grid(column=0, row=0, sticky='e')
@@ -317,16 +317,38 @@ class Right_User_Frame(Right_Frame):
             self.submit_button.configure(state = 'normal')
             self.error_label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
             return True
-    
+        
     def commit_data(self):
         cursor = self.connection.cursor()
         query = 'INSERT INTO patient(P_name, DOB, Sex, Address, Branch_ID, Room_no) values (%s, %s, %s, %s, %s, %s)'
         self.address_var.set(self.address_textbox.get('1.0', ctk.END))
-        # try:
-        values = (self.p_name_var.get(), self.dob_var.get(), self.sex_var.get(), self.address_var.get(), int(self.branch_id_var.get()), int(self.room_no_var.get()))
-        cursor.execute(query, values)
-        self.connection.commit()
-        self.after(1500, self.user_insert_window.destroy)
+        try:
+            values = (self.p_name_var.get(), self.dob_var.get(), self.sex_var.get(), self.address_var.get(), int(self.branch_id_var.get()), int(self.room_no_var.get()))
+            cursor.execute(query, values)
+        except err.MySQLError as e:
+            if e.args[0] == 1644:
+                self.room_no_entry.configure(border_color = 'red')
+                # self.submit_button.configure(state = 'disbaled')
+                self.error_label.configure(text = 'Room Occupied!', text_color = 'red', image = self.error_img, compound = 'left')
+                
+            if e.args[0] == 1048:
+                if (self.p_name_entry.get()).isdigit():
+                     self.p_name_entry.configure(border_color = 'red')
+                     self.error_label.configure(text = ' Name cannot be a number ', text_color = 'red', image = self.error_img, compound = 'left')
+                     self.submit_button.configure(state = 'disabled')
+
+                else:
+                    self.p_name_entry.configure(border_color = 'red')
+                    self.error_label.configure(text = ' Name cannot be empty', text_color = 'red', image = self.error_img, compound = 'left')
+                    self.submit_button.configure(state = 'disabled')
+
+        else:
+            self.p_name_entry.configure(border_color = 'green')
+            self.submit_button.configure(state = 'normal')
+            self.error_label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
+
+            self.connection.commit()
+            self.after(1500, self.user_insert_window.destroy)
 
 
 class Right_Admin_Frame(Right_Frame):

@@ -50,8 +50,8 @@ class Left_Frame(ctk.CTkFrame):
 
         self.logout_button = ctk.CTkButton(self)
 
-        logo = ctk.CTkImage(Image.open('logo.png'), size=(76, 76))
-        self.logo_label = ctk.CTkLabel(self, text='', image=logo, bg_color= 'transparent')
+        logo = ctk.CTkImage(Image.open('logo.jpg'), size=(100, 100))
+        self.logo_label = ctk.CTkLabel(self, text='', image=logo)
 
         # Layout
         self.mute_button.place(x=5, y=5)

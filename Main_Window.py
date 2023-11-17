@@ -50,8 +50,8 @@ class Left_Frame(ctk.CTkFrame):
 
         self.logout_button = ctk.CTkButton(self)
 
-        logo = ctk.CTkImage(Image.open('logo.jpg'), size=(100, 100))
-        self.logo_label = ctk.CTkLabel(self, text='', image=logo)
+        logo = ctk.CTkImage(Image.open('logo.png'), size=(76, 76))
+        self.logo_label = ctk.CTkLabel(self, text='', image=logo, bg_color= 'transparent')
 
         # Layout
         self.mute_button.place(x=5, y=5)
@@ -87,11 +87,11 @@ class Left_User_Frame(Left_Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.profile_pic = ctk.CTkImage(Image.open('Saurab.png'), size=(298,451))
+        self.profile_pic = ctk.CTkImage(Image.open('Saurab.png'), size=(500,498))
         self.profile_label = ctk.CTkLabel(self, image=self.profile_pic, text='')
         self.user_img = ctk.CTkImage(Image.open('user.png'))
 
-        self.profile_label.place(relx=0.5, rely=0.5, anchor='center')
+        self.profile_label.place(relx=0.5, rely=0.47, anchor='center')
 
         self.welcome_label.configure(text='  Welcome, User', font=('Futura', 20, "bold"), image = self.user_img, compound = 'left')
 
@@ -101,11 +101,11 @@ class Left_Admin_Frame(Left_Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.profile_pic = ctk.CTkImage(Image.open('Saurab.png'), size=(378,504))
+        self.profile_pic = ctk.CTkImage(Image.open('ACD293.png'), size=(500,498))
         self.profile_label = ctk.CTkLabel(self, image=self.profile_pic, text='')
 
         self.admin_img = ctk.CTkImage(Image.open('admin.png'))
-        self.profile_label.place(relx=0.5, rely=0.43, anchor='center')
+        self.profile_label.place(relx=0.5, rely=0.47, anchor='center')
 
         self.welcome_label.configure(text=' Welcome, Admin', font=('Futura', 20, "bold"), image = self.admin_img, compound = 'left')
 

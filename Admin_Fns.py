@@ -1,6 +1,5 @@
 import customtkinter as ctk
 from tkinter import ttk
-# import ttkbootstrap as ttk
 from PIL import Image
 
 class Insert(ctk.CTkToplevel):
@@ -1681,3 +1680,5 @@ class Delete(ctk.CTkToplevel):
 class Update(ctk.CTkToplevel):
     def __init__(self, connection):
         super().__init__()
+        self.geometry('800x600')
+        self

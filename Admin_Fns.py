@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk
 from PIL import Image
+from datetime import datetime
 
 class Insert(ctk.CTkToplevel):
     def __init__(self, connection):
@@ -129,7 +130,9 @@ class Insert(ctk.CTkToplevel):
                                                                                           e_error_label ),
                                                                                          validate = "focusout")
         self.e_salary_entry = ctk.CTkEntry(self.emp_frame, textvariable=salary_var)
-        self.e_doj_entry = ctk.CTkEntry(self.emp_frame, textvariable=doj_var)
+        self.e_doj_entry = ctk.CTkEntry(self.emp_frame, textvariable=doj_var, validatecommand = lambda : self.validate_date(doj_var.get(),self.e_doj_entry,
+                                                                                                                              e_error_label,
+                                                                                                                               submit_button ), validate = "focusout")
 
         # Comboboxes
         cursor = self.connection.cursor()
@@ -607,7 +610,6 @@ class Insert(ctk.CTkToplevel):
 
     def commit_data(self, table, cols, values):
         cursor = self.connection.cursor()
-
         format_specifier = '%s'
         for i in range(len(cols) - 1):
             if i == range(len(cols) - 1):
@@ -749,6 +751,25 @@ class Insert(ctk.CTkToplevel):
            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
            return True
 
+    def validate_date(self, input_date, err_widget, err_label, submit):
+        try:
+            if input_date != datetime.strptime(input_date, "%Y-%m-%d").strftime('%Y-%m-%d'):
+                raise ValueError
+          
+        except ValueError:
+            err_widget.configure(border_color = 'red')
+            err_label.configure(text = ' Invalid Date Format\n Valid Format : yyyy/mm/dd', text_color = 'red', image = self.error_img, compound = 'left')
+            submit.configure(state='disabled')
+            return False
+    
+        else:
+            err_widget.configure(border_color = 'green')
+            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+            submit.configure(state='normal')
+            return True
+
+    
+                
 
 class View(ctk.CTkToplevel):
     def __init__(self, connection):

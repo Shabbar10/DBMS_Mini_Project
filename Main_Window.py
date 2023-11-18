@@ -37,7 +37,7 @@ class Left_Frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color='#0f0f0f')
         self.create_widgets()
-        # self.play_music()
+        self.play_music()
     
     def create_widgets(self):
         self.mute_image = ctk.CTkImage(Image.open('mute1.png'), size=(18,18))
@@ -240,7 +240,7 @@ class Right_User_Frame(Right_Frame):
         self.gender_list = ['M', 'F']
         # Textvariables
         self.p_name_var = ctk.StringVar()
-        self.dob_var = ctk.StringVar(value='yyyy/mm/dd')
+        self.dob_var = ctk.StringVar(value='yyyy-mm-dd')
         self.sex_var = ctk.StringVar(value= self.gender_list[0] )
         self.address_var = ctk.StringVar()
         self.branch_id_var = ctk.StringVar( value = self.id_list[0])

@@ -357,7 +357,7 @@ class Insert(ctk.CTkToplevel):
 
         # Textvariables
         p_name_var = ctk.StringVar()
-        dob_var = ctk.StringVar(value='yyyy/mm/dd')
+        dob_var = ctk.StringVar(value='yyyy-mm-dd')
         sex_var = ctk.StringVar()
         branch_id_var = ctk.StringVar()
         room_no_var = ctk.StringVar()
@@ -400,7 +400,7 @@ class Insert(ctk.CTkToplevel):
             my_dict[bid] = room_no_list
 
         branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var, state = 'readonly')
-
+        room_no_combo  = ctk.CTkComboBox(self.patient, values=room_no_list, variable=room_no_var, state = 'readonly')
         cursor.close()
 
         # Submit Button
@@ -411,6 +411,11 @@ class Insert(ctk.CTkToplevel):
                                       text_color='black', 
                                       hover_color='cyan')
 
+        dob_entry.configure(validatecommand = lambda : self.validate_dob(dob_var.get(),dob_entry,self.error_label,submit_button), validate = "focusout")
+        p_name_entry.configure(validatecommand = lambda: self.not_null(submit_button,
+                                                                       p_name_entry,
+                                                                       self.error_label
+                                                                       ), validate = "focus")
         # Layout
         p_name_label.grid(column=0, row=0, sticky='e')
         dob_label.grid(column=0, row=1, sticky='e')
@@ -418,13 +423,14 @@ class Insert(ctk.CTkToplevel):
         address_label.grid(column=0, row=3, sticky='e')
         branch_id_label.grid(column=0, row=4, sticky='e')
         room_no_label.grid(column=0, row=5, sticky='e')
+        self.error_label.grid(column=0, row=6, sticky='ns', columnspan = 2)
 
         p_name_entry.grid(column=1, row=0, sticky='ew', padx=50)
         dob_entry.grid(column=1, row=1, sticky='ew', padx=50)
         sex_entry.grid(column=1, row=2, sticky='ew', padx=50)
         address_textbox.grid(column=1, row=3, sticky='nsew', padx=50)
         branch_id_combo.grid(column=1, row=4, sticky='ew', padx=50)
-
+        room_no_combo.grid(column=1, row=5, sticky='ew', padx=50)
         submit_button.grid(column=0, row=7, columnspan=2)
 
     def patient_records_form(self):
@@ -621,6 +627,7 @@ class Insert(ctk.CTkToplevel):
 
         cursor.execute(query, values)
         self.connection.commit()
+        self.after(1500, self.destroy)
 
     def change_size(self, event):
         center_x = int((self.winfo_screenwidth() - 700) / 2)
@@ -767,7 +774,32 @@ class Insert(ctk.CTkToplevel):
             err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
             submit.configure(state='normal')
             return True
-              
+
+        
+    def validate_dob(self, date, err_widget, err_label, submit):
+
+        if (self.validate_date(date, err_widget, err_label, submit)):
+
+            err_widget.configure(border_color = 'green')
+            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+            submit.configure(state='normal')
+
+            date_enter = datetime.strptime(date, "%Y-%m-%d")    
+            curr = datetime.now()
+
+            if date_enter.date() > curr.date():
+                err_widget.configure(border_color = 'red')
+                err_label.configure(text = "  Invalid Date of Birth",text_color = 'red', image = self.error_img, compound = 'left' )
+                submit.configure(state = 'disabled')
+
+                return False
+            else:
+                err_widget.configure(border_color = 'green')
+                err_label.configure(text = " ",text_color = 'red', image = self.done_img, compound = 'left' )
+                submit.configure(state = 'normal')
+                return True
+    
+           
 
 class View(ctk.CTkToplevel):
     def __init__(self, connection):
@@ -1692,6 +1724,7 @@ class Delete(ctk.CTkToplevel):
         cursor = self.connection.cursor()
         cursor.execute(query)
         self.connection.commit()
+        self.after(1500, self.destroy)
 
         # self.show_table(['Record_no', 'PID', 'Treatment_Type', 'Date', 'Bill'], 'Patient_Records')
         self.show_table(cols, table)
@@ -1800,6 +1833,9 @@ class Update(ctk.CTkToplevel):
 
         self.table = ttk.Treeview(self.table_frame)
 
+        self.error_img = ctk.CTkImage(Image.open('error.png'))
+        self.done_img = ctk.CTkImage(Image.open('done.png'))
+
         self.employee_update()
 
         # Layout
@@ -1811,7 +1847,7 @@ class Update(ctk.CTkToplevel):
         # Define the grid
         self.employee.columnconfigure((0,1,2,3), weight=1)
         self.employee.rowconfigure(0, weight=1)
-        self.employee.rowconfigure((1,2,3,4), weight=2)
+        self.employee.rowconfigure((1,2,3,4,5), weight=2)
 
         # Variables
         emp_id_var = ctk.StringVar()
@@ -1828,6 +1864,7 @@ class Update(ctk.CTkToplevel):
         doj_label = ctk.CTkLabel(self.employee, text='DOJ', font=('Helvetica', 14))
         mgr_id_label = ctk.CTkLabel(self.employee, text='Managager ID', font=('Helvetica', 14))
         branch_id_label = ctk.CTkLabel(self.employee, text='Branch ID', font=('Helvetica', 14))
+        self.error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
         # Combobox
         self.cursor.execute('SELECT Emp_ID, MGR_ID, Branch_ID FROM Employee')
@@ -1866,6 +1903,10 @@ class Update(ctk.CTkToplevel):
         # Update button
         update_button = ctk.CTkButton(self.employee, text='Update', command=lambda e=None: self.update_record('Employee', cols, [emp_name_var.get(), salary_var.get(), doj_var.get(), mgr_id_var.get(), branch_id_var.get()], 'Emp_ID', emp_id_var.get()))
 
+
+        emp_name_entry.configure(validatecommand = lambda : self.not_null(update_button, 
+                                                                          emp_name_entry,
+                                                                          self.error_label), validate = "focus")
         # Layout
         emp_id_label.grid(column=0, row=0, columnspan=2)
         emp_id_combo.grid(column=2, row=0, columnspan=2, sticky='ew', padx=50)
@@ -1875,6 +1916,7 @@ class Update(ctk.CTkToplevel):
         doj_label.grid(column=0, row=2)
         mgr_id_label.grid(column=2, row=2)
         branch_id_label.grid(column=0, row=3)
+        self.error_label.grid(column=1, row=4, columnspan =2)
 
         emp_name_entry.grid(column=1, row=1)
         salary_entry.grid(column=3, row=1)
@@ -1882,7 +1924,7 @@ class Update(ctk.CTkToplevel):
         mgr_id_combo.grid(column=3, row=2)
         branch_id_combo.grid(column=1, row=3)
 
-        update_button.grid(column=0, row=4, columnspan=4)
+        update_button.grid(column=0, row=5, columnspan=4)
 
     def populate(self, table, pk, pk_val, col_list, var_list):
         query = 'SELECT {} FROM {} WHERE {} = {}'.format(', '.join(col_list), table, pk, pk_val)
@@ -1895,9 +1937,74 @@ class Update(ctk.CTkToplevel):
             index += 1
 
     def update_record(self, table, col_list, val_list, pk, pk_val):
-        pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
-        query = 'UPDATE {} SET {} WHERE {} = {}'.format(table, pairs, pk, pk_val)
+        try:
+            pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
+            query = 'UPDATE {} SET {} WHERE {} = {}'.format(table, pairs, pk, pk_val)
+            self.cursor.execute(query)
+            
+        except Exception:
+            self.error_label.configure(text = ' ERROR', text_color = 'red', image = self.error_img, compound = 'left')
 
+        else:
+            self.connection.commit()
+            self.after(1500, self.destroy)
 
-        self.cursor.execute(query)
-        self.connection.commit()
+    def validate_date(self, input_date, err_widget, err_label, submit):
+        try:
+            if input_date != datetime.strptime(input_date, "%Y-%m-%d").strftime('%Y-%m-%d'):
+                raise ValueError
+          
+        except ValueError:
+            err_widget.configure(border_color = 'red')
+            err_label.configure(text = ' Invalid Date Format\n Valid Format : yyyy/mm/dd', text_color = 'red', image = self.error_img, compound = 'left')
+            submit.configure(state='disabled')
+            return False
+    
+        else:
+            err_widget.configure(border_color = 'green')
+            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+            submit.configure(state='normal')
+            return True
+    
+    def validate_dob(self, date, err_widget, err_label, submit):
+
+        if (self.validate_date(date, err_widget, err_label, submit)):
+
+            err_widget.configure(border_color = 'green')
+            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+            submit.configure(state='normal')
+
+            date_enter = datetime.strptime(date, "%Y-%m-%d")    
+            curr = datetime.now()
+
+            if date_enter.date() > curr.date():
+                err_widget.configure(border_color = 'red')
+                err_label.configure(text = "  Invalid Date of Birth",text_color = 'red', image = self.error_img, compound = 'left' )
+                submit.configure(state = 'disabled')
+
+                return False
+            else:
+                err_widget.configure(border_color = 'green')
+                err_label.configure(text = " ",text_color = 'red', image = self.done_img, compound = 'left' )
+                submit.configure(state = 'normal')
+                return True
+    
+    def not_null(self, submit, err_widget, label):
+        input = err_widget.get()
+        if  len(input) == 0:
+            err_widget.configure(border_color = 'red')
+            label.configure(text=' Name cannot be empty', text_color = 'red', image = self.error_img, compound = 'left')
+            submit.configure(state = 'disabled')
+            return False
+        
+        elif input.isdigit():
+            err_widget.configure(border_color = 'red')
+            label.configure(text=' Name cannot be a number ', text_color = 'red', image = self.error_img, compound = 'left')
+            submit.configure(state = 'disabled')
+
+            return False
+        else:
+                err_widget.configure(border_color = 'green')
+            # self.submit_button.configure(state = 'normal')
+                label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
+                return True

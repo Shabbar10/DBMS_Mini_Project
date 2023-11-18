@@ -4,6 +4,8 @@ import pygame
 import pymysql
 from pymysql import err
 import Admin_Fns as af
+from datetime import datetime
+
 
 is_muted = False
 
@@ -256,7 +258,11 @@ class Right_User_Frame(Right_Frame):
 
         self.room_no_entry = ctk.CTkComboBox(frame, values= self.room_list, variable=self.room_no_var, state = 'readonly')
 
+
+        self.dob_entry.configure(validatecommand = lambda : self.validate_dob(self.dob_var.get(),self.dob_entry,self.error_label,
+                                                                                                                     self.submit_button), validate = "focusout")
         # Layout
+                                                                                                                     
         self.p_name_label.grid(column=0, row=0, sticky='e')
         self.dob_label.grid(column=0, row=1, sticky='e')
         self.sex_label.grid(column=0, row=2, sticky='e')
@@ -334,12 +340,13 @@ class Right_User_Frame(Right_Frame):
                 if (self.p_name_entry.get()).isdigit():
                      self.p_name_entry.configure(border_color = 'red')
                      self.error_label.configure(text = ' Name cannot be a number ', text_color = 'red', image = self.error_img, compound = 'left')
-                     self.submit_button.configure(state = 'disabled')
 
                 else:
                     self.p_name_entry.configure(border_color = 'red')
                     self.error_label.configure(text = ' Name cannot be empty', text_color = 'red', image = self.error_img, compound = 'left')
                     self.submit_button.configure(state = 'disabled')
+        except Exception:
+                    self.error_label.configure(text = ' ERROR', text_color = 'red', image = self.error_img, compound = 'left')
 
         else:
             self.p_name_entry.configure(border_color = 'green')
@@ -349,6 +356,47 @@ class Right_User_Frame(Right_Frame):
             self.connection.commit()
             self.after(1500, self.user_insert_window.destroy)
 
+    def validate_date(self, input_date, err_widget, err_label, submit):
+        try:
+            if input_date != datetime.strptime(input_date, "%Y-%m-%d").strftime('%Y-%m-%d'):
+                raise ValueError
+          
+            
+        except ValueError:
+            err_widget.configure(border_color = 'red')
+            err_label.configure(text = ' Invalid Date Format\n Valid Format : yyyy/mm/dd', text_color = 'red', image = self.error_img, compound = 'left')
+            return False
+        
+        else:
+            err_widget.configure(border_color = 'green')
+            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+            submit.configure(state='normal')
+            return True
+
+    
+    def validate_dob(self, date, err_widget, err_label, submit):
+
+        if (self.validate_date(date, err_widget, err_label, submit)):
+
+            err_widget.configure(border_color = 'green')
+            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+            submit.configure(state='normal')
+
+            date_enter = datetime.strptime(date, "%Y-%m-%d")    
+            curr = datetime.now()
+
+            if date_enter.date() > curr.date():
+                err_widget.configure(border_color = 'red')
+                err_label.configure(text = "  Invalid Date of Birth",text_color = 'red', image = self.error_img, compound = 'left' )
+                submit.configure(state = 'disabled')
+
+                return False
+            else:
+                err_widget.configure(border_color = 'green')
+                err_label.configure(text = " ",text_color = 'red', image = self.done_img, compound = 'left' )
+                submit.configure(state = 'normal')
+                return True
+        
 
 class Right_Admin_Frame(Right_Frame):
     def __init__(self, parent, connection):

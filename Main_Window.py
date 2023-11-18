@@ -1,8 +1,8 @@
 import customtkinter as ctk
 from PIL import Image
 import pygame
-import pymysql
 from pymysql import err
+
 import Admin_Fns as af
 from datetime import datetime
 
@@ -39,7 +39,7 @@ class Left_Frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color='#0f0f0f')
         self.create_widgets()
-        self.play_music()
+        # self.play_music()
     
     def create_widgets(self):
         self.mute_image = ctk.CTkImage(Image.open('mute1.png'), size=(18,18))
@@ -199,9 +199,6 @@ class Right_User_Frame(Right_Frame):
         self.view_button.configure(command=None)
         self.view_button.configure(command=None)
         self.view_button.configure(command=None)
-
-
-
 
     def user_insert(self):
         
@@ -406,3 +403,4 @@ class Right_Admin_Frame(Right_Frame):
         self.view_button.configure(command=lambda: af.View(connection))
         self.delete_button.configure(command=lambda: af.Delete(connection))
         self.update_button.configure(command=lambda: af.Update(connection))
+        

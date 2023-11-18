@@ -400,7 +400,8 @@ class Insert(ctk.CTkToplevel):
             my_dict[bid] = room_no_list
 
         branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var, state = 'readonly')
-        room_no_combo  = ctk.CTkComboBox(self.patient, values=room_no_list, variable=room_no_var, state = 'readonly')
+        room_no_combo = ctk.CTkComboBox(self.patient, values=room_no_list, variable=room_no_var, state = 'readonly')
+
         cursor.close()
 
         # Submit Button
@@ -1418,6 +1419,7 @@ class Delete(ctk.CTkToplevel):
         self.table = ttk.Treeview(self.table_frame)
 
         self.employee_delete()
+        self.show_table(['Emp_ID', 'Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID'], 'Employee')
         self.room_delete()
         self.patient_delete()
         self.patient_records_delete()
@@ -1811,9 +1813,9 @@ class Update(ctk.CTkToplevel):
         self.update()
 
         center_x = int((self.winfo_screenwidth() - 1366) / 2)
-        center_y = int((self.winfo_screenheight() - 500) / 2)
+        center_y = int((self.winfo_screenheight() - 700) / 2)
 
-        self.geometry(f'1366x500+{center_x}+{center_y}')
+        self.geometry(f'1366x700+{center_x}+{center_y}')
         self.title('Admin Update')
         self.grab_set()
         self.create_widgets()
@@ -1823,7 +1825,7 @@ class Update(ctk.CTkToplevel):
         self.table_frame = ctk.CTkFrame(self)
 
         # Tabs
-        self.tabs = ctk.CTkTabview(self.update_frame, command=None)
+        self.tabs = ctk.CTkTabview(self.update_frame, command=lambda e=None: self.choose_table())
         self.employee = self.tabs.add('Employee')
         self.room = self.tabs.add('Room')
         self.patient = self.tabs.add('Patient')
@@ -1837,6 +1839,12 @@ class Update(ctk.CTkToplevel):
         self.done_img = ctk.CTkImage(Image.open('done.png'))
 
         self.employee_update()
+        self.show_table(['Emp_ID', 'Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID'], 'Employee')
+        self.room_update()
+        self.patient_update()
+        # self.patient_records_update()
+        # self.treatment_update()
+        # self.cares_for_update()
 
         # Layout
         self.update_frame.pack(expand=True, fill='both', side='left')
@@ -1846,8 +1854,8 @@ class Update(ctk.CTkToplevel):
     def employee_update(self):
         # Define the grid
         self.employee.columnconfigure((0,1,2,3), weight=1)
-        self.employee.rowconfigure(0, weight=1)
-        self.employee.rowconfigure((1,2,3,4,5), weight=2)
+        self.employee.rowconfigure(0, weight=3)
+        self.employee.rowconfigure((1,2,3,4), weight=1)
 
         # Variables
         emp_id_var = ctk.StringVar()
@@ -1857,7 +1865,7 @@ class Update(ctk.CTkToplevel):
         mgr_id_var = ctk.StringVar()
         branch_id_var = ctk.StringVar()
         
-        # Label
+        # Labels
         emp_id_label = ctk.CTkLabel(self.employee, text='Employee ID', font=('Helvetica', 14))
         emp_name_label = ctk.CTkLabel(self.employee, text='Employee Name', font=('Helvetica', 14))
         salary_label = ctk.CTkLabel(self.employee, text='Salary', font=('Helvetica', 14))
@@ -1866,7 +1874,7 @@ class Update(ctk.CTkToplevel):
         branch_id_label = ctk.CTkLabel(self.employee, text='Branch ID', font=('Helvetica', 14))
         self.error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
-        # Combobox
+        # Comboboxes
         self.cursor.execute('SELECT Emp_ID, MGR_ID, Branch_ID FROM Employee')
         results = self.cursor.fetchall()
         emp_id_list = []
@@ -1892,7 +1900,7 @@ class Update(ctk.CTkToplevel):
         cols = ['Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID']
 
         emp_id_combo = ctk.CTkComboBox(self.employee, values=emp_id_list, variable=emp_id_var, state='readonly', command=lambda e=None: self.populate('Employee', 'Emp_ID', emp_id_var.get(), cols, [emp_name_var, salary_var, doj_var, mgr_id_var, branch_id_var]))
-        mgr_id_combo = ctk.CTkComboBox(self.employee, values=mgr_id_list, variable=mgr_id_var)
+        mgr_id_combo = ctk.CTkComboBox(self.employee, values=mgr_id_list, variable=mgr_id_var, state='readonly')
         branch_id_combo = ctk.CTkComboBox(self.employee, values=branch_id_list, variable=branch_id_var, state='readonly')
 
         # Entries
@@ -1901,7 +1909,7 @@ class Update(ctk.CTkToplevel):
         doj_entry = ctk.CTkEntry(self.employee, textvariable=doj_var)
 
         # Update button
-        update_button = ctk.CTkButton(self.employee, text='Update', command=lambda e=None: self.update_record('Employee', cols, [emp_name_var.get(), salary_var.get(), doj_var.get(), mgr_id_var.get(), branch_id_var.get()], 'Emp_ID', emp_id_var.get()))
+        update_button = ctk.CTkButton(self.employee, text='Update', command=lambda e=None: self.update_record('Employee', cols, [emp_name_var.get(), salary_var.get(), doj_var.get(), mgr_id_var.get(), branch_id_var.get()], 'Emp_ID', emp_id_var.get(), self.error_label))
 
 
         emp_name_entry.configure(validatecommand = lambda : self.not_null(update_button, 
@@ -1926,6 +1934,158 @@ class Update(ctk.CTkToplevel):
 
         update_button.grid(column=0, row=5, columnspan=4)
 
+
+
+    
+
+    def room_update(self):
+        # Define the grid
+        self.room.columnconfigure((0,1,2,3), weight=1)
+        self.room.rowconfigure((0,1), weight=3)
+        self.room.rowconfigure((2,3,4), weight=1)
+
+        # Variables
+        branch_id_var = ctk.StringVar()
+        room_no_var = ctk.StringVar()
+        room_type_var = ctk.StringVar()
+        capacity_var = ctk.StringVar()
+        available_var = ctk.StringVar()
+
+        # Labels
+        branch_id_label = ctk.CTkLabel(self.room, text='Branch ID', font=('Helvetica', 14))
+        room_no_label = ctk.CTkLabel(self.room, text='Room No', font=('Helvetica', 14))
+        room_type_label = ctk.CTkLabel(self.room, text='Room Type', font=('Helvetica', 14))
+        capacity_label = ctk.CTkLabel(self.room, text='Capacity', font=('Helvetica', 14))
+        available_label = ctk.CTkLabel(self.room, text='Available', font=('Helvetica', 14))
+
+        # Comboboxes
+        branch_id_list = []
+        room_no_list = []
+
+        self.cursor.execute('SELECT DISTINCT Branch_ID FROM Room')
+        results = self.cursor.fetchall()
+
+        for bid in results:
+            branch_id_list.append(str(bid[0]))
+
+        self.cursor.execute('SELECT DISTINCT Room_no FROM Room')
+        results = self.cursor.fetchall()
+
+        for rno in results:
+            room_no_list.append(str(rno[0]))
+
+        cols = ['R_Type', 'Capacity', 'Available']
+
+        branch_id_combo = ctk.CTkComboBox(self.room, values=branch_id_list, variable=branch_id_var)
+        room_no_combo = ctk.CTkComboBox(self.room, values=room_no_list, variable=room_no_var)
+
+        # Entries
+        room_type_entry = ctk.CTkEntry(self.room, textvariable=room_type_var)
+        capacity_entry = ctk.CTkEntry(self.room, textvariable=capacity_var)
+        available_entry = ctk.CTkEntry(self.room, textvariable=available_var)
+
+        # Update button
+        update_button = ctk.CTkButton(self.room, text='Update', command=lambda e=None: self.update_record_composite('Room', cols, [room_type_var.get(), capacity_var.get(), available_var.get()], ['Branch_ID', 'Room_no'], [branch_id_var.get(), room_no_var.get()]))
+
+        # Layout
+        branch_id_label.grid(column=0, row=0, columnspan=2)
+        room_no_label.grid(column=0, row=1, columnspan=2)
+
+        branch_id_combo.grid(column=2, row=0, columnspan=2)
+        room_no_combo.grid(column=2, row=1, columnspan=2)
+
+        room_type_label.grid(column=0, row=2)
+        capacity_label.grid(column=2, row=2)
+        available_label.grid(column=0, row=3)
+
+        room_type_entry.grid(column=1, row=2, sticky='ew', padx=50)
+        capacity_entry.grid(column=3, row=2, sticky='ew', padx=50)
+        available_entry.grid(column=1, row=3, sticky='ew', padx=50)
+
+        update_button.grid(column=0, row=4, columnspan=4)
+
+    def patient_update(self):
+        # Define the grid
+        self.patient.columnconfigure((0,1,2,3), weight=1)
+        self.patient.rowconfigure(0, weight=3)
+        self.patient.rowconfigure((1,2,3,4), weight=1)
+
+        # Variables
+        patient_id_var = ctk.StringVar()
+        patient_name_var = ctk.StringVar()
+        dob_var = ctk.StringVar()
+        sex_var = ctk.StringVar()
+        address_var = ctk.StringVar()
+        branch_id_var = ctk.StringVar()
+        room_no_var = ctk.StringVar()
+
+        # Labels
+        patient_id_label = ctk.CTkLabel(self.patient, text='Patient ID', font=('Helvetica', 14))
+        patient_name_label = ctk.CTkLabel(self.patient, text='Patient Name', font=('Helvetica', 14))
+        dob_label = ctk.CTkLabel(self.patient, text='DOB', font=('Helvetica', 14))
+        sex_label = ctk.CTkLabel(self.patient, text='Sex', font=('Helvetica', 14))
+        address_label = ctk.CTkLabel(self.patient, text='Address', font=('Helvetica', 14))
+        branch_id_label = ctk.CTkLabel(self.patient, text='Branch ID', font=('Helvetica', 14))
+        room_no_label = ctk.CTkLabel(self.patient, text='Room No', font=('Helvetica', 14))
+
+        # Comboboxes
+        patient_id_list = []
+        branch_id_list = []
+        room_no_list = []
+
+        self.cursor.execute('SELECT DISTINCT PID FROM Patient')
+        results = self.cursor.fetchall()
+
+        for pid in results:
+            patient_id_list.append(str(pid[0]))
+
+        self.cursor.execute('SELECT DISTINCT Branch_ID FROM Patient')
+        results = self.cursor.fetchall()
+
+        for bid in results:
+            branch_id_list.append(str(bid[0]))
+
+        self.cursor.execute('SELECT DISTINCT Room_no FROM Patient')
+        results = self.cursor.fetchall()
+
+        for rno in results:
+            room_no_list.append(str(rno[0]))
+
+        cols = ['P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no']
+
+        patient_id_combo = ctk.CTkComboBox(self.patient, values=patient_id_list, variable=patient_id_var, command=lambda e=None: self.populate('Patient', 'PID', patient_id_var.get(), cols, [patient_name_var, dob_var, sex_var, address_var, branch_id_var, room_no_var]))
+        branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var)
+        room_no_combo = ctk.CTkComboBox(self.patient, values=room_no_list, variable=room_no_var)
+
+        # Entries
+        patient_name_entry = ctk.CTkEntry(self.patient, textvariable=patient_name_var)
+        dob_entry = ctk.CTkEntry(self.patient, textvariable=dob_var)
+        sex_entry = ctk.CTkEntry(self.patient, textvariable=sex_var)
+        address_entry = ctk.CTkEntry(self.patient, textvariable=address_var)
+
+        # Update button
+        update_button = ctk.CTkButton(self.patient, text='Update', command=lambda e=None: self.update_record('Patient', cols, [patient_name_var.get(), dob_var.get(), sex_var.get(), address_var.get()], 'PID', patient_id_var.get()))
+
+        # Layout
+        patient_id_label.grid(column=0, row=0, columnspan=2)
+        patient_id_combo.grid(column=2, row=0, columnspan=2)
+
+        patient_name_label.grid(column=0, row=1)
+        dob_label.grid(column=2, row=1)
+        sex_label.grid(column=0, row=2)
+        address_label.grid(column=2, row=2)
+        branch_id_label.grid(column=0, row=3)
+        room_no_label.grid(column=2, row=3)
+
+        patient_name_entry.grid(column=1, row=1, sticky='ew', padx=50)
+        dob_entry.grid(column=3, row=1, sticky='ew', padx=50)
+        sex_entry.grid(column=1, row=2, sticky='ew', padx=50)
+        address_entry.grid(column=3, row=2, sticky='ew', padx=50)
+        branch_id_combo.grid(column=1, row=3, sticky='ew', padx=50)
+        room_no_combo.grid(column=3, row=3, sticky='ew', padx=50)
+
+        update_button.grid(column=0, row=4, columnspan=4)
+
     def populate(self, table, pk, pk_val, col_list, var_list):
         query = 'SELECT {} FROM {} WHERE {} = {}'.format(', '.join(col_list), table, pk, pk_val)
         self.cursor.execute(query)
@@ -1936,18 +2096,88 @@ class Update(ctk.CTkToplevel):
             var_list[index].set(result[index])
             index += 1
 
-    def update_record(self, table, col_list, val_list, pk, pk_val):
+    def choose_table(self):
+        if self.tabs.get() == 'Employee':
+            self.show_table(['Emp_ID', 'Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID'], 'Employee')
+
+        elif self.tabs.get() == 'Room':
+            self.show_table(['Room_no', 'Branch_ID', 'R_type', 'Capacity', 'Available'], 'Room')
+
+        elif self.tabs.get() == 'Patient':
+            self.show_table(['PID', 'P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no'], 'Patient')
+
+        elif self.tabs.get() == 'Patient Record':
+            self.show_table(['Record_no', 'PID', 'Treatment_Type', 'Date', 'Bill'], 'Patient_Records')
+
+        elif self.tabs.get() == 'Treatment':
+            self.show_table(['Emp_ID', 'PID', 'Date_Start', 'Date_end'], 'Treatment')
+
+        elif self.tabs.get() == 'Assigned Nurse':
+            self.show_table(['Emp_ID', 'PID', 'Shift'], 'Cares_for')
+
+    def show_table(self, cols, table):
+        self.table.delete(*self.table.get_children())
+        self.table.pack_forget()
+        style = ttk.Style()
+
+        # Configure the style for the Treeview widget
+        style.theme_use("clam")  # Change the theme to 'clam' (you can try other themes)
+        style.configure("Treeview",
+                        background="#c2c2c2",  # Background color
+                        foreground="black",    # Foreground color (text color)
+                        rowheight=25,          # Row height
+                        fieldbackground="#f0f0f0"  # Background color for fields
+                        )
+        style.map("Treeview",  # Map the Treeview widget with specific settings
+                background=[('selected', '#0078D7')],  # Selected item background color
+                foreground=[('selected', 'white')]    # Selected item text color
+                )
+        
+        self.table = ttk.Treeview(self.table_frame, columns=cols, show='headings', style='Treeview')
+
+        query = 'SELECT {} FROM {}'.format(', '.join(cols), table)
+
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        for col in cols:
+            self.table.heading(f'{col}', text=f'{col.title()}')
+
+        for row in results:
+            self.table.insert('', ctk.END, values=row)
+
+        self.table.pack(expand=True, fill='both')
+
+    def update_record(self, table, col_list, val_list, pk, pk_val, err_label):
         try:
             pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
             query = 'UPDATE {} SET {} WHERE {} = {}'.format(table, pairs, pk, pk_val)
-            self.cursor.execute(query)
-            
-        except Exception:
-            self.error_label.configure(text = ' ERROR', text_color = 'red', image = self.error_img, compound = 'left')
 
+            self.cursor.execute(query)
+        except Exception :
+               err_label.configure(text = ' ERROR', text_color = 'red', image = self.error_img, compound = 'left')
         else:
-            self.connection.commit()
-            self.after(1500, self.destroy)
+                self.connection.commit()
+
+                temp = [pk]
+                for each in col_list:
+                    temp.append(each)
+
+                self.show_table(temp, table)
+
+    def update_record_composite(self, table, col_list, val_list, pk, pk_val):
+        pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
+        query = 'UPDATE {} SET {} WHERE {} = {} AND {} = {}'.format(table, pairs, pk[0], pk_val[0], pk[1], pk_val[1])
+
+        self.cursor.execute(query)
+        self.connection.commit()
+
+        temp = [pk[0], pk[1]]
+        for each in col_list:
+            temp.append(each)
+
+        self.show_table(temp, table)
 
     def validate_date(self, input_date, err_widget, err_label, submit):
         try:
@@ -1965,7 +2195,25 @@ class Update(ctk.CTkToplevel):
             err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
             submit.configure(state='normal')
             return True
-    
+    def not_null(self, submit, err_widget, label):
+        input = err_widget.get()
+        if  len(input) == 0:
+            err_widget.configure(border_color = 'red')
+            label.configure(text=' Name cannot be empty', text_color = 'red', image = self.error_img, compound = 'left')
+            submit.configure(state = 'disabled')
+            return False
+        
+        elif input.isdigit():
+            err_widget.configure(border_color = 'red')
+            label.configure(text=' Name cannot be a number ', text_color = 'red', image = self.error_img, compound = 'left')
+            submit.configure(state = 'disabled')
+
+            return False
+        else:
+                err_widget.configure(border_color = 'green')
+            # self.submit_button.configure(state = 'normal')
+                label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
+                return True
     def validate_dob(self, date, err_widget, err_label, submit):
 
         if (self.validate_date(date, err_widget, err_label, submit)):
@@ -1987,24 +2235,4 @@ class Update(ctk.CTkToplevel):
                 err_widget.configure(border_color = 'green')
                 err_label.configure(text = " ",text_color = 'red', image = self.done_img, compound = 'left' )
                 submit.configure(state = 'normal')
-                return True
-    
-    def not_null(self, submit, err_widget, label):
-        input = err_widget.get()
-        if  len(input) == 0:
-            err_widget.configure(border_color = 'red')
-            label.configure(text=' Name cannot be empty', text_color = 'red', image = self.error_img, compound = 'left')
-            submit.configure(state = 'disabled')
-            return False
-        
-        elif input.isdigit():
-            err_widget.configure(border_color = 'red')
-            label.configure(text=' Name cannot be a number ', text_color = 'red', image = self.error_img, compound = 'left')
-            submit.configure(state = 'disabled')
-
-            return False
-        else:
-                err_widget.configure(border_color = 'green')
-            # self.submit_button.configure(state = 'normal')
-                label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
                 return True

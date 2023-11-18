@@ -97,12 +97,11 @@ class Left_User_Frame(Left_Frame):
         self.welcome_label.configure(text='  Welcome, User', font=('Futura', 20, "bold"), image = self.user_img, compound = 'left')
 
 
-
 class Left_Admin_Frame(Left_Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.profile_pic = ctk.CTkImage(Image.open('ACD293.png'), size=(500,498))
+        self.profile_pic = ctk.CTkImage(Image.open('Saurab.png'), size=(500,498))
         self.profile_label = ctk.CTkLabel(self, image=self.profile_pic, text='')
 
         self.admin_img = ctk.CTkImage(Image.open('admin.png'))

@@ -1819,13 +1819,24 @@ class Update(ctk.CTkToplevel):
 
         for row in results:
             emp_id_list.append(str(row[0]))
-            mgr_id_list.append(str(row[1]))
-            branch_id_list.append(str(row[2]))
+
+        mgr_id_list.append('0')
+        self.cursor.execute('SELECT DISTINCT MGR_ID FROM Employee')
+        results = self.cursor.fetchall()
+        for row in results:
+            mgr_id_list.append(str(row[0]))
+
+        mgr_id_list.remove('None')
+            
+        self.cursor.execute('SELECT DISTINCT Branch_ID FROM Employee')
+        results = self.cursor.fetchall()
+        for row in results:
+            branch_id_list.append(str(row[0]))
 
         cols = ['Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID']
 
         emp_id_combo = ctk.CTkComboBox(self.employee, values=emp_id_list, variable=emp_id_var, state='readonly', command=lambda e=None: self.populate('Employee', 'Emp_ID', emp_id_var.get(), cols, [emp_name_var, salary_var, doj_var, mgr_id_var, branch_id_var]))
-        mgr_id_combo = ctk.CTkComboBox(self.employee, values=mgr_id_list, variable=mgr_id_var, state='readonly')
+        mgr_id_combo = ctk.CTkComboBox(self.employee, values=mgr_id_list, variable=mgr_id_var)
         branch_id_combo = ctk.CTkComboBox(self.employee, values=branch_id_list, variable=branch_id_var, state='readonly')
 
         # Entries
@@ -1867,6 +1878,7 @@ class Update(ctk.CTkToplevel):
     def update_record(self, table, col_list, val_list, pk, pk_val):
         pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
         query = 'UPDATE {} SET {} WHERE {} = {}'.format(table, pairs, pk, pk_val)
+
 
         self.cursor.execute(query)
         self.connection.commit()

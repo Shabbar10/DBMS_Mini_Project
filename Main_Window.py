@@ -37,7 +37,7 @@ class Left_Frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color='#0f0f0f')
         self.create_widgets()
-        self.play_music()
+        # self.play_music()
     
     def create_widgets(self):
         self.mute_image = ctk.CTkImage(Image.open('mute1.png'), size=(18,18))

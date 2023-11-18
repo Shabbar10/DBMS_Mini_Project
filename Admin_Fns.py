@@ -1753,3 +1753,120 @@ class Delete(ctk.CTkToplevel):
 class Update(ctk.CTkToplevel):
     def __init__(self, connection):
         super().__init__()
+        self.connection = connection
+        self.cursor = self.connection.cursor()
+
+        self.update()
+
+        center_x = int((self.winfo_screenwidth() - 1366) / 2)
+        center_y = int((self.winfo_screenheight() - 500) / 2)
+
+        self.geometry(f'1366x500+{center_x}+{center_y}')
+        self.title('Admin Update')
+        self.grab_set()
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.update_frame = ctk.CTkFrame(self)
+        self.table_frame = ctk.CTkFrame(self)
+
+        # Tabs
+        self.tabs = ctk.CTkTabview(self.update_frame, command=None)
+        self.employee = self.tabs.add('Employee')
+        self.room = self.tabs.add('Room')
+        self.patient = self.tabs.add('Patient')
+        self.patient_records = self.tabs.add('Patient Record')
+        self.treatment = self.tabs.add('Treatment')
+        self.cares_for = self.tabs.add('Assigned Nurse')
+
+        self.table = ttk.Treeview(self.table_frame)
+
+        self.employee_update()
+
+        # Layout
+        self.update_frame.pack(expand=True, fill='both', side='left')
+        self.table_frame.pack(expand=True, fill='both', side='left')
+        self.tabs.pack(expand=True, fill='both')
+
+    def employee_update(self):
+        # Define the grid
+        self.employee.columnconfigure((0,1,2,3), weight=1)
+        self.employee.rowconfigure(0, weight=1)
+        self.employee.rowconfigure((1,2,3,4), weight=2)
+
+        # Variables
+        emp_id_var = ctk.StringVar()
+        emp_name_var = ctk.StringVar()
+        salary_var = ctk.StringVar()
+        doj_var = ctk.StringVar()
+        mgr_id_var = ctk.StringVar()
+        branch_id_var = ctk.StringVar()
+        
+        # Label
+        emp_id_label = ctk.CTkLabel(self.employee, text='Employee ID', font=('Helvetica', 14))
+        emp_name_label = ctk.CTkLabel(self.employee, text='Employee Name', font=('Helvetica', 14))
+        salary_label = ctk.CTkLabel(self.employee, text='Salary', font=('Helvetica', 14))
+        doj_label = ctk.CTkLabel(self.employee, text='DOJ', font=('Helvetica', 14))
+        mgr_id_label = ctk.CTkLabel(self.employee, text='Managager ID', font=('Helvetica', 14))
+        branch_id_label = ctk.CTkLabel(self.employee, text='Branch ID', font=('Helvetica', 14))
+
+        # Combobox
+        self.cursor.execute('SELECT Emp_ID, MGR_ID, Branch_ID FROM Employee')
+        results = self.cursor.fetchall()
+        emp_id_list = []
+        mgr_id_list = []
+        branch_id_list = []
+
+        for row in results:
+            emp_id_list.append(str(row[0]))
+            mgr_id_list.append(str(row[1]))
+            branch_id_list.append(str(row[2]))
+
+        cols = ['Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID']
+
+        emp_id_combo = ctk.CTkComboBox(self.employee, values=emp_id_list, variable=emp_id_var, state='readonly', command=lambda e=None: self.populate('Employee', 'Emp_ID', emp_id_var.get(), cols, [emp_name_var, salary_var, doj_var, mgr_id_var, branch_id_var]))
+        mgr_id_combo = ctk.CTkComboBox(self.employee, values=mgr_id_list, variable=mgr_id_var, state='readonly')
+        branch_id_combo = ctk.CTkComboBox(self.employee, values=branch_id_list, variable=branch_id_var, state='readonly')
+
+        # Entries
+        emp_name_entry = ctk.CTkEntry(self.employee, textvariable=emp_name_var)
+        salary_entry = ctk.CTkEntry(self.employee, textvariable=salary_var)
+        doj_entry = ctk.CTkEntry(self.employee, textvariable=doj_var)
+
+        # Update button
+        update_button = ctk.CTkButton(self.employee, text='Update', command=lambda e=None: self.update_record('Employee', cols, [emp_name_var.get(), salary_var.get(), doj_var.get(), mgr_id_var.get(), branch_id_var.get()], 'Emp_ID', emp_id_var.get()))
+
+        # Layout
+        emp_id_label.grid(column=0, row=0, columnspan=2)
+        emp_id_combo.grid(column=2, row=0, columnspan=2, sticky='ew', padx=50)
+
+        emp_name_label.grid(column=0, row=1)
+        salary_label.grid(column=2, row=1)
+        doj_label.grid(column=0, row=2)
+        mgr_id_label.grid(column=2, row=2)
+        branch_id_label.grid(column=0, row=3)
+
+        emp_name_entry.grid(column=1, row=1)
+        salary_entry.grid(column=3, row=1)
+        doj_entry.grid(column=1, row=2)
+        mgr_id_combo.grid(column=3, row=2)
+        branch_id_combo.grid(column=1, row=3)
+
+        update_button.grid(column=0, row=4, columnspan=4)
+
+    def populate(self, table, pk, pk_val, col_list, var_list):
+        query = 'SELECT {} FROM {} WHERE {} = {}'.format(', '.join(col_list), table, pk, pk_val)
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        
+        index = 0
+        for each in col_list:
+            var_list[index].set(result[index])
+            index += 1
+
+    def update_record(self, table, col_list, val_list, pk, pk_val):
+        pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
+        query = 'UPDATE {} SET {} WHERE {} = {}'.format(table, pairs, pk, pk_val)
+
+        self.cursor.execute(query)
+        self.connection.commit()

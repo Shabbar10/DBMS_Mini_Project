@@ -767,9 +767,7 @@ class Insert(ctk.CTkToplevel):
             err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
             submit.configure(state='normal')
             return True
-
-    
-                
+              
 
 class View(ctk.CTkToplevel):
     def __init__(self, connection):

@@ -90,7 +90,7 @@ class Insert(ctk.CTkToplevel):
         self.h_address_textbox = ctk.CTkTextbox(self.hospital, font=('Helvetica', 14), fg_color='#343638', height=100, width=370, border_color='#565b5e', border_width=2, activate_scrollbars=False)
 
         # Submit button
-        submit_button = ctk.CTkButton(self.hospital, text='Submit', command=lambda: self.commit_data('Hospital', ('Branch_ID', 'H_Name', 'Address'), (int(branch_id_var.get()), branch_name_var.get(), self.address_textbox.get('1.0', ctk.END))), fg_color='#144870', text_color='black', hover_color='cyan')
+        submit_button = ctk.CTkButton(self.hospital, text='Submit', command=lambda: self.commit_data('Hospital', ('Branch_ID', 'Branch_Name', 'Address'), (int(branch_id_var.get()), branch_name_var.get(), self.address_textbox.get('1.0', ctk.END))), fg_color='#144870', text_color='black', hover_color='cyan')
 
         # Layout
         branch_id_label.grid(column=0, row=0, sticky='e')
@@ -871,7 +871,7 @@ class View(ctk.CTkToplevel):
 
         # Checkboxes
         branch_id_check = ctk.CTkCheckBox(self.hospital, text='Branch ID', variable=branch_id_var, onvalue='Branch_ID', offvalue='', command=lambda: self.toggle_entry(branch_id_var.get(), branch_id_entry))
-        branch_name_check = ctk.CTkCheckBox(self.hospital, text='Branch Name', variable=branch_name_var, onvalue='H_Name', offvalue='', command=lambda: self.toggle_entry(branch_name_var.get(), branch_name_entry))
+        branch_name_check = ctk.CTkCheckBox(self.hospital, text='Branch Name', variable=branch_name_var, onvalue='Branch_Name', offvalue='', command=lambda: self.toggle_entry(branch_name_var.get(), branch_name_entry))
         address_check = ctk.CTkCheckBox(self.hospital, text='Address', variable=address_var, onvalue='Address', offvalue='', command=lambda: self.toggle_entry(address_var.get(), address_entry))
 
         # Entries
@@ -1841,8 +1841,8 @@ class Update(ctk.CTkToplevel):
         self.room_update()
         self.patient_update()
         self.patient_records_update()
-        # self.treatment_update()
-        # self.cares_for_update()
+        self.treatment_update()
+        self.assigned_nurse_update()
 
         # Layout
         self.update_frame.pack(expand=True, fill='both', side='left')
@@ -1888,7 +1888,7 @@ class Update(ctk.CTkToplevel):
         for row in results:
             mgr_id_list.append(str(row[0]))
 
-        mgr_id_list.remove('None')
+        # mgr_id_list.remove('None')
             
         self.cursor.execute('SELECT DISTINCT Branch_ID FROM Employee')
         results = self.cursor.fetchall()
@@ -2193,7 +2193,7 @@ class Update(ctk.CTkToplevel):
         date_end_entry = ctk.CTkEntry(self.treatment, textvariable=date_end_var)
 
         # Update button
-        update_button = ctk.CTkButton(self.patient_records, text='Update', command=lambda e=None: self.update_record_composite('Treatment', cols, [date_start_var.get(), date_end_var.get()], ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], self.error_label))
+        update_button = ctk.CTkButton(self.treatment, text='Update', command=lambda e=None: self.update_record_composite('Treatment', cols, [date_start_var.get(), date_end_var.get()], ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], self.error_label))
 
         # Layout
         emp_id_label.grid(column=0, row=0, columnspan=2)
@@ -2208,6 +2208,62 @@ class Update(ctk.CTkToplevel):
 
         date_start_entry.grid(column=1, row=2, sticky='ew', padx=50)
         date_end_entry.grid(column=3, row=2, sticky='ew', padx=50)
+
+        update_button.grid(column=0, row=4, columnspan=4)
+
+    def assigned_nurse_update(self):
+        # Define the grid
+        self.cares_for.columnconfigure((0,1,2,3), weight=1)
+        self.cares_for.rowconfigure(0, weight=3)
+        self.cares_for.rowconfigure((1,2,3,4), weight=1)
+
+        # Variables
+        emp_id_var = ctk.StringVar()
+        patient_id_var = ctk.StringVar()
+        shift_var = ctk.StringVar()
+
+        # Labels
+        emp_id_label = ctk.CTkLabel(self.cares_for, text='Record No', font=('Helvetica', 14))
+        patient_id_label = ctk.CTkLabel(self.cares_for, text='Patient ID', font=('Helvetica', 14))
+        shift_label = ctk.CTkLabel(self.cares_for, text='Treatment Type', font=('Helvetica', 14))
+
+        # Comboboxes
+        emp_id_list = []
+        patient_id_list = []
+
+        self.cursor.execute('SELECT DISTINCT Emp_ID FROM Treatment')
+        results = self.cursor.fetchall()
+
+        for eid in results:
+            emp_id_list.append(str(eid[0]))
+
+        self.cursor.execute('SELECT DISTINCT PID FROM Patient_Records')
+        results = self.cursor.fetchall()
+
+        for pid in results:
+            patient_id_list.append(str(pid[0]))
+
+        cols = ['Shift']
+
+       
+        emp_id_combo = ctk.CTkComboBox(self.cares_for, values=emp_id_list, variable=emp_id_var, command=lambda e=None: self.enable_combo(patient_id_combo))
+        patient_id_combo = ctk.CTkComboBox(self.cares_for, values=patient_id_list, variable=patient_id_var, state='disabled', command=lambda e=None: self.populate_composite('Treatment', ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], cols, [date_start_var, date_end_var]))
+        shift_combo = ctk.CTkComboBox(self.cares_for, values=['Morning', 'Evening'], variable=shift_var, state='readonly')
+
+        # Update button
+        update_button = ctk.CTkButton(self.cares_for, text='Update', command=lambda e=None: self.update_record_composite('Cares_for', cols, shift_var.get(), ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], self.error_label))
+
+        # Layout
+        emp_id_label.grid(column=0, row=0, columnspan=2)
+        patient_id_label.grid(column=0, row=1, columnspan=2)
+
+        emp_id_combo.grid(column=2, row=0, columnspan=2)
+        patient_id_combo.grid(column=2, row=1, columnspan=2)
+
+        shift_label.grid(column=0, row=2)
+        self.error_label.grid(column=1, row=3, columnspan=2)
+
+        shift_combo.grid(column=1, row=2, sticky='ew', padx=50)
 
         update_button.grid(column=0, row=4, columnspan=4)
 

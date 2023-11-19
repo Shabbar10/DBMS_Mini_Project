@@ -378,7 +378,7 @@ class Insert(ctk.CTkToplevel):
         address_label = ctk.CTkLabel(self.patient, text='Address', font=('Helvetica', 14))
         branch_id_label = ctk.CTkLabel(self.patient, text='Branch ID', font=('Helvetica', 14))
         room_no_label = ctk.CTkLabel(self.patient, text='Room No.', font=('Helvetica', 14))
-        self.error_label = ctk.CTkLabel(self.patient, text='', text_color='red', font=('Helvetica', 14))
+        error_label = ctk.CTkLabel(self.patient, text='', text_color='red', font=('Helvetica', 14))
 
         # Entries
         p_name_entry = ctk.CTkEntry(self.patient, textvariable=p_name_var)
@@ -421,10 +421,10 @@ class Insert(ctk.CTkToplevel):
                                       text_color='black', 
                                       hover_color='cyan')
 
-        dob_entry.configure(validatecommand = lambda : self.validate_dob(dob_var.get(),dob_entry,self.error_label,submit_button), validate = "focusout")
+        dob_entry.configure(validatecommand = lambda : self.validate_dob(dob_var.get(),dob_entry,error_label,submit_button), validate = "focusout")
         p_name_entry.configure(validatecommand = lambda: self.not_null(submit_button,
                                                                        p_name_entry,
-                                                                       self.error_label
+                                                                       error_label
                                                                        ), validate = "focus")
         # Layout
         p_name_label.grid(column=0, row=0, sticky='e')
@@ -433,7 +433,7 @@ class Insert(ctk.CTkToplevel):
         address_label.grid(column=0, row=3, sticky='e')
         branch_id_label.grid(column=0, row=4, sticky='e')
         room_no_label.grid(column=0, row=5, sticky='e')
-        self.error_label.grid(column=0, row=6, sticky='ns', columnspan = 2)
+        error_label.grid(column=0, row=6, sticky='ns', columnspan = 2)
 
         p_name_entry.grid(column=1, row=0, sticky='ew', padx=50)
         dob_entry.grid(column=1, row=1, sticky='ew', padx=50)
@@ -1935,7 +1935,7 @@ class Update(ctk.CTkToplevel):
         doj_label = ctk.CTkLabel(self.employee, text='DOJ', font=('Helvetica', 14))
         mgr_id_label = ctk.CTkLabel(self.employee, text='Managager ID', font=('Helvetica', 14))
         branch_id_label = ctk.CTkLabel(self.employee, text='Branch ID', font=('Helvetica', 14))
-        self.error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
+        error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
         # Comboboxes
         self.cursor.execute('SELECT Emp_ID FROM Employee')
@@ -1972,12 +1972,12 @@ class Update(ctk.CTkToplevel):
         doj_entry = ctk.CTkEntry(self.employee, textvariable=doj_var)
 
         # Update button
-        update_button = ctk.CTkButton(self.employee, text='Update', command=lambda e=None: self.update_record('Employee', cols, [emp_name_var.get(), salary_var.get(), doj_var.get(), mgr_id_var.get(), branch_id_var.get()], 'Emp_ID', emp_id_var.get(), self.error_label))
+        update_button = ctk.CTkButton(self.employee, text='Update', command=lambda e=None: self.update_record('Employee', cols, [emp_name_var.get(), salary_var.get(), doj_var.get(), mgr_id_var.get(), branch_id_var.get()], 'Emp_ID', emp_id_var.get(), error_label))
 
 
         emp_name_entry.configure(validatecommand = lambda : self.not_null(update_button, 
                                                                           emp_name_entry,
-                                                                          self.error_label), validate = "focus")
+                                                                          error_label), validate = "focus")
         # Layout
         emp_id_label.grid(column=0, row=0, columnspan=2)
         emp_id_combo.grid(column=2, row=0, columnspan=2, sticky='ew', padx=50)
@@ -1987,7 +1987,7 @@ class Update(ctk.CTkToplevel):
         doj_label.grid(column=0, row=2)
         mgr_id_label.grid(column=2, row=2)
         branch_id_label.grid(column=0, row=3)
-        self.error_label.grid(column=1, row=4, columnspan=2)
+        error_label.grid(column=1, row=4, columnspan=2)
 
         emp_name_entry.grid(column=1, row=1)
         salary_entry.grid(column=3, row=1)
@@ -2056,7 +2056,7 @@ class Update(ctk.CTkToplevel):
         room_type_label.grid(column=0, row=2)
         capacity_label.grid(column=2, row=2)
         available_label.grid(column=0, row=3)
-        self.error_label.grid(column=1, row=4, columnspan=2)
+        error_label.grid(column=1, row=4, columnspan=2)
 
         room_type_entry.grid(column=1, row=2, sticky='ew', padx=50)
         capacity_entry.grid(column=3, row=2, sticky='ew', padx=50)
@@ -2087,7 +2087,7 @@ class Update(ctk.CTkToplevel):
         address_label = ctk.CTkLabel(self.patient, text='Address', font=('Helvetica', 14))
         branch_id_label = ctk.CTkLabel(self.patient, text='Branch ID', font=('Helvetica', 14))
         room_no_label = ctk.CTkLabel(self.patient, text='Room No', font=('Helvetica', 14))
-        self.error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
+        error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
         # Comboboxes
         patient_id_list = []
@@ -2125,7 +2125,7 @@ class Update(ctk.CTkToplevel):
         address_entry = ctk.CTkEntry(self.patient, textvariable=address_var)
 
         # Update button
-        update_button = ctk.CTkButton(self.patient, text='Update', command=lambda e=None: self.update_record('Patient', cols, [patient_name_var.get(), dob_var.get(), sex_var.get(), address_var.get()], 'PID', patient_id_var.get(), self.error_label))
+        update_button = ctk.CTkButton(self.patient, text='Update', command=lambda e=None: self.update_record('Patient', cols, [patient_name_var.get(), dob_var.get(), sex_var.get(), address_var.get()], 'PID', patient_id_var.get(), error_label))
 
         # Layout
         patient_id_label.grid(column=0, row=0, columnspan=2)
@@ -2166,7 +2166,7 @@ class Update(ctk.CTkToplevel):
         treatment_type_label = ctk.CTkLabel(self.patient_records, text='Treatment Type', font=('Helvetica', 14))
         date_label = ctk.CTkLabel(self.patient_records, text='Date', font=('Helvetica', 14))
         bill_label = ctk.CTkLabel(self.patient_records, text='Bill', font=('Helvetica', 14))
-        self.error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
+        error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
         # Comboboxes
         record_no_list = []
@@ -2195,7 +2195,7 @@ class Update(ctk.CTkToplevel):
         bill_entry = ctk.CTkEntry(self.patient_records, textvariable=bill_var)
 
         # Update button
-        update_button = ctk.CTkButton(self.patient_records, text='Update', command=lambda e=None: self.update_record('Patient_Records', cols, [patient_id_var.get(), treatment_type_var.get(), date_var.get(), bill_var.get()], 'Record_no', record_no_var.get(), self.error_label))
+        update_button = ctk.CTkButton(self.patient_records, text='Update', command=lambda e=None: self.update_record('Patient_Records', cols, [patient_id_var.get(), treatment_type_var.get(), date_var.get(), bill_var.get()], 'Record_no', record_no_var.get(), error_label))
 
         # Layout
         record_no_label.grid(column=0, row=0, columnspan=2)
@@ -2205,7 +2205,7 @@ class Update(ctk.CTkToplevel):
         treatment_type_label.grid(column=2, row=1)
         date_label.grid(column=0, row=2)
         bill_label.grid(column=2, row=2)
-        self.error_label.grid(column=1, row=3, columnspan=2)
+        error_label.grid(column=1, row=3, columnspan=2)
 
         treatment_type_entry.grid(column=3, row=1, sticky='ew', padx=50)
         date_entry.grid(column=1, row=2, sticky='ew', padx=50)
@@ -2258,7 +2258,7 @@ class Update(ctk.CTkToplevel):
         date_end_entry = ctk.CTkEntry(self.treatment, textvariable=date_end_var)
 
         # Update button
-        update_button = ctk.CTkButton(self.treatment, text='Update', command=lambda e=None: self.update_record_composite('Treatment', cols, [date_start_var.get(), date_end_var.get()], ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], self.error_label))
+        update_button = ctk.CTkButton(self.treatment, text='Update', command=lambda e=None: self.update_record_composite('Treatment', cols, [date_start_var.get(), date_end_var.get()], ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], error_label))
 
         # Layout
         emp_id_label.grid(column=0, row=0, columnspan=2)
@@ -2269,7 +2269,7 @@ class Update(ctk.CTkToplevel):
 
         date_start_label.grid(column=0, row=2)
         date_end_label.grid(column=2, row=2)
-        self.error_label.grid(column=1, row=3, columnspan=2)
+        error_label.grid(column=1, row=3, columnspan=2)
 
         date_start_entry.grid(column=1, row=2, sticky='ew', padx=50)
         date_end_entry.grid(column=3, row=2, sticky='ew', padx=50)
@@ -2316,7 +2316,7 @@ class Update(ctk.CTkToplevel):
         shift_combo = ctk.CTkComboBox(self.cares_for, values=['Morning', 'Evening'], variable=shift_var, state='readonly')
 
         # Update button
-        update_button = ctk.CTkButton(self.cares_for, text='Update', command=lambda e=None: self.update_record_composite('Cares_for', cols, shift_var.get(), ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], self.error_label))
+        update_button = ctk.CTkButton(self.cares_for, text='Update', command=lambda e=None: self.update_record_composite('Cares_for', cols, shift_var.get(), ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], error_label))
 
         # Layout
         emp_id_label.grid(column=0, row=0, columnspan=2)
@@ -2326,7 +2326,7 @@ class Update(ctk.CTkToplevel):
         patient_id_combo.grid(column=2, row=1, columnspan=2)
 
         shift_label.grid(column=0, row=2)
-        self.error_label.grid(column=1, row=3, columnspan=2)
+        error_label.grid(column=1, row=3, columnspan=2)
 
         shift_combo.grid(column=1, row=2, sticky='ew', padx=50)
 
@@ -2426,17 +2426,21 @@ class Update(ctk.CTkToplevel):
                 self.show_table(temp, table)
 
     def update_record_composite(self, table, col_list, val_list, pk, pk_val, err_label):
-        pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
-        query = 'UPDATE {} SET {} WHERE {} = {} AND {} = {}'.format(table, pairs, pk[0], pk_val[0], pk[1], pk_val[1])
+        try:
+            pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
+            query = 'UPDATE {} SET {} WHERE {} = {} AND {} = {}'.format(table, pairs, pk[0], pk_val[0], pk[1], pk_val[1])
 
-        self.cursor.execute(query)
-        self.connection.commit()
+            self.cursor.execute(query)
+        except Exception:
+            err_label.configure(text = ' ERROR', text_color = 'red', image = self.error_img, compound = 'left')
+        else:
+            self.connection.commit()
 
-        temp = [pk[0], pk[1]]
-        for each in col_list:
-            temp.append(each)
+            temp = [pk[0], pk[1]]
+            for each in col_list:
+                temp.append(each)
 
-        self.show_table(temp, table)
+            self.show_table(temp, table)
 
     def validate_date(self, input_date, err_widget, err_label, submit):
         try:
@@ -2470,8 +2474,8 @@ class Update(ctk.CTkToplevel):
 
             return False
         else:
+                submit.configure(state='normal')
                 err_widget.configure(border_color = 'green')
-            # self.submit_button.configure(state = 'normal')
                 label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
                 return True
         

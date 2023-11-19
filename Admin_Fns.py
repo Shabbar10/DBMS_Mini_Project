@@ -775,7 +775,6 @@ class Insert(ctk.CTkToplevel):
             err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
             submit.configure(state='normal')
             return True
-
         
     def validate_dob(self, date, err_widget, err_label, submit):
 
@@ -800,7 +799,6 @@ class Insert(ctk.CTkToplevel):
                 submit.configure(state = 'normal')
                 return True
     
-           
 
 class View(ctk.CTkToplevel):
     def __init__(self, connection):
@@ -1875,7 +1873,7 @@ class Update(ctk.CTkToplevel):
         self.error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
         # Comboboxes
-        self.cursor.execute('SELECT Emp_ID, MGR_ID, Branch_ID FROM Employee')
+        self.cursor.execute('SELECT Emp_ID FROM Employee')
         results = self.cursor.fetchall()
         emp_id_list = []
         mgr_id_list = []
@@ -1885,7 +1883,7 @@ class Update(ctk.CTkToplevel):
             emp_id_list.append(str(row[0]))
 
         mgr_id_list.append('0')
-        self.cursor.execute('SELECT DISTINCT MGR_ID FROM Employee')
+        self.cursor.execute('SELECT DISTINCT Emp_ID FROM Employee')
         results = self.cursor.fetchall()
         for row in results:
             mgr_id_list.append(str(row[0]))
@@ -1938,7 +1936,7 @@ class Update(ctk.CTkToplevel):
         # Define the grid
         self.room.columnconfigure((0,1,2,3), weight=1)
         self.room.rowconfigure((0,1), weight=3)
-        self.room.rowconfigure((2,3,4), weight=1)
+        self.room.rowconfigure((2,3,4,5), weight=1)
 
         # Variables
         branch_id_var = ctk.StringVar()
@@ -1993,12 +1991,13 @@ class Update(ctk.CTkToplevel):
         room_type_label.grid(column=0, row=2)
         capacity_label.grid(column=2, row=2)
         available_label.grid(column=0, row=3)
+        self.error_label.grid(column=1, row=4, columnspan=2)
 
         room_type_entry.grid(column=1, row=2, sticky='ew', padx=50)
         capacity_entry.grid(column=3, row=2, sticky='ew', padx=50)
         available_entry.grid(column=1, row=3, sticky='ew', padx=50)
 
-        update_button.grid(column=0, row=4, columnspan=4)
+        update_button.grid(column=0, row=5, columnspan=4)
 
     def patient_update(self):
         # Define the grid
@@ -2087,7 +2086,7 @@ class Update(ctk.CTkToplevel):
         # Define the grid
         self.patient_records.columnconfigure((0,1,2,3), weight=1)
         self.patient_records.rowconfigure(0, weight=3)
-        self.patient_records.rowconfigure((1,2,3), weight=1)
+        self.patient_records.rowconfigure((1,2,3,4), weight=1)
 
         # Variables
         record_no_var = ctk.StringVar()
@@ -2126,9 +2125,9 @@ class Update(ctk.CTkToplevel):
         patient_id_combo = ctk.CTkComboBox(self.patient_records, values=patient_id_list, variable=patient_id_var)
 
         # Entries
-        treatment_type_entry = ctk.CTkEntry(self.patient, textvariable=treatment_type_var)
-        date_entry = ctk.CTkEntry(self.patient, textvariable=date_var)
-        bill_entry = ctk.CTkEntry(self.patient, textvariable=bill_var)
+        treatment_type_entry = ctk.CTkEntry(self.patient_records, textvariable=treatment_type_var)
+        date_entry = ctk.CTkEntry(self.patient_records, textvariable=date_var)
+        bill_entry = ctk.CTkEntry(self.patient_records, textvariable=bill_var)
 
         # Update button
         update_button = ctk.CTkButton(self.patient_records, text='Update', command=lambda e=None: self.update_record('Patient_Records', cols, [patient_id_var.get(), treatment_type_var.get(), date_var.get(), bill_var.get()], 'Record_no', record_no_var.get(), self.error_label))
@@ -2149,11 +2148,87 @@ class Update(ctk.CTkToplevel):
 
         update_button.grid(column=0, row=4, columnspan=4)
 
+    def treatment_update(self):
+        # Define the grid
+        self.treatment.columnconfigure((0,1,2,3), weight=1)
+        self.treatment.rowconfigure(0, weight=3)
+        self.treatment.rowconfigure((1,2,3,4), weight=1)
+
+        # Variables
+        emp_id_var = ctk.StringVar()
+        patient_id_var = ctk.StringVar()
+        date_start_var = ctk.StringVar()
+        date_end_var = ctk.StringVar()
+
+        # Labels
+        emp_id_label = ctk.CTkLabel(self.treatment, text='Record No', font=('Helvetica', 14))
+        patient_id_label = ctk.CTkLabel(self.treatment, text='Patient ID', font=('Helvetica', 14))
+        date_start_label = ctk.CTkLabel(self.treatment, text='Treatment Type', font=('Helvetica', 14))
+        date_end_label = ctk.CTkLabel(self.treatment, text='Date', font=('Helvetica', 14))
+
+        # Comboboxes
+        emp_id_list = []
+        patient_id_list = []
+
+        self.cursor.execute('SELECT DISTINCT Emp_ID FROM Treatment')
+        results = self.cursor.fetchall()
+
+        for eid in results:
+            emp_id_list.append(str(eid[0]))
+
+        self.cursor.execute('SELECT DISTINCT PID FROM Patient_Records')
+        results = self.cursor.fetchall()
+
+        for pid in results:
+            patient_id_list.append(str(pid[0]))
+
+        cols = ['Date_Start', 'Date_end']
+
+        # lambda e=None: self.populate('Patient_Records', 'Record_no', record_no_var.get(), cols, [patient_id_var, treatment_type_var, date_var, bill_var])
+        emp_id_combo = ctk.CTkComboBox(self.treatment, values=emp_id_list, variable=emp_id_var, command=lambda e=None: self.enable_combo(patient_id_combo))
+        patient_id_combo = ctk.CTkComboBox(self.treatment, values=patient_id_list, variable=patient_id_var, state='disabled', command=lambda e=None: self.populate_composite('Treatment', ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], cols, [date_start_var, date_end_var]))
+
+        # Entries
+        date_start_entry = ctk.CTkEntry(self.treatment, textvariable=date_start_var)
+        date_end_entry = ctk.CTkEntry(self.treatment, textvariable=date_end_var)
+
+        # Update button
+        update_button = ctk.CTkButton(self.patient_records, text='Update', command=lambda e=None: self.update_record_composite('Treatment', cols, [date_start_var.get(), date_end_var.get()], ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], self.error_label))
+
+        # Layout
+        emp_id_label.grid(column=0, row=0, columnspan=2)
+        patient_id_label.grid(column=0, row=1, columnspan=2)
+
+        emp_id_combo.grid(column=2, row=0, columnspan=2)
+        patient_id_combo.grid(column=2, row=1, columnspan=2)
+
+        date_start_label.grid(column=0, row=2)
+        date_end_label.grid(column=2, row=2)
+        self.error_label.grid(column=1, row=3, columnspan=2)
+
+        date_start_entry.grid(column=1, row=2, sticky='ew', padx=50)
+        date_end_entry.grid(column=3, row=2, sticky='ew', padx=50)
+
+        update_button.grid(column=0, row=4, columnspan=4)
+
+    def enable_combo(self, widget):
+        widget.configure(state='readonly')
+
     def populate(self, table, pk, pk_val, col_list, var_list):
         query = 'SELECT {} FROM {} WHERE {} = {}'.format(', '.join(col_list), table, pk, pk_val)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         
+        index = 0
+        for each in col_list:
+            var_list[index].set(result[index])
+            index += 1
+
+    def populate_composite(self, table, pk, pk_val, col_list, var_list):
+        query = 'SELECT {} FROM {} WHERE {} = {} AND {} = {}'.format(', '.join(col_list), table, pk[0], pk_val[0], pk[1], pk_val[1])
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+
         index = 0
         for each in col_list:
             var_list[index].set(result[index])
@@ -2229,7 +2304,7 @@ class Update(ctk.CTkToplevel):
 
                 self.show_table(temp, table)
 
-    def update_record_composite(self, table, col_list, val_list, pk, pk_val):
+    def update_record_composite(self, table, col_list, val_list, pk, pk_val, err_label):
         pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
         query = 'UPDATE {} SET {} WHERE {} = {} AND {} = {}'.format(table, pairs, pk[0], pk_val[0], pk[1], pk_val[1])
 
@@ -2301,3 +2376,4 @@ class Update(ctk.CTkToplevel):
                 err_label.configure(text = " ",text_color = 'red', image = self.done_img, compound = 'left' )
                 submit.configure(state = 'normal')
                 return True
+            

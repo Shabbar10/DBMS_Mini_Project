@@ -281,7 +281,6 @@ class Right_User_Frame(Right_Frame):
         # Event
         self.dob_entry.bind('<Button-1>', lambda e: self.dob_entry.delete(0, ctk.END))
 
-   
     
     def get_room_id(self, b_id):
         self.room_list.clear()

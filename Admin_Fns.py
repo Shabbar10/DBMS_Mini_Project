@@ -2016,6 +2016,7 @@ class Update(ctk.CTkToplevel):
         room_type_label = ctk.CTkLabel(self.room, text='Room Type', font=('Helvetica', 14))
         capacity_label = ctk.CTkLabel(self.room, text='Capacity', font=('Helvetica', 14))
         available_label = ctk.CTkLabel(self.room, text='Available', font=('Helvetica', 14))
+        error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
         # Comboboxes
         branch_id_list = []
@@ -2230,6 +2231,7 @@ class Update(ctk.CTkToplevel):
         patient_id_label = ctk.CTkLabel(self.treatment, text='Patient ID', font=('Helvetica', 14))
         date_start_label = ctk.CTkLabel(self.treatment, text='Treatment Type', font=('Helvetica', 14))
         date_end_label = ctk.CTkLabel(self.treatment, text='Date', font=('Helvetica', 14))
+        error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
         # Comboboxes
         emp_id_list = []
@@ -2291,6 +2293,7 @@ class Update(ctk.CTkToplevel):
         emp_id_label = ctk.CTkLabel(self.cares_for, text='Record No', font=('Helvetica', 14))
         patient_id_label = ctk.CTkLabel(self.cares_for, text='Patient ID', font=('Helvetica', 14))
         shift_label = ctk.CTkLabel(self.cares_for, text='Treatment Type', font=('Helvetica', 14))
+        error_label = ctk.CTkLabel(self.employee, text='', font=('Helvetica', 14))
 
         # Comboboxes
         emp_id_list = []

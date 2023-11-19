@@ -10,16 +10,20 @@ class Insert(ctk.CTkToplevel):
 
         self.update()
 
-        center_x = int((self.winfo_screenwidth() - 600) / 2)
-        center_y = int((self.winfo_screenheight() - 350) / 2)
+        center_x = int((self.winfo_screenwidth() - 1366) / 2)
+        center_y = int((self.winfo_screenheight() - 700) / 2)
 
-        self.geometry(f'700x350+{center_x}+{center_y}')
+        self.geometry(f'1366x700+{center_x}+{center_y}')
         self.title('Admin Insert')
         self.grab_set()
         self.create_widgets()
 
     def create_widgets(self):
-        self.tabs = ctk.CTkTabview(self, command=lambda e=None: self.change_size(e))
+        self.insert_frame = ctk.CTkFrame(self)
+        self.table_frame = ctk.CTkScrollableFrame(self, orientation='horizontal')
+
+        #  command=lambda e=None: self.change_size(e)
+        self.tabs = ctk.CTkTabview(self.insert_frame, command=lambda e=None: self.choose_table())
         self.hospital = self.tabs.add('Hospital')
 
         self.employee = self.tabs.add('Employee')
@@ -39,7 +43,10 @@ class Insert(ctk.CTkToplevel):
         self.error_img = ctk.CTkImage(Image.open('error.png'))
         self.done_img = ctk.CTkImage(Image.open('done.png'))
 
+        self.table = ttk.Treeview(self.table_frame)
+
         self.hospital_form()
+        self.show_table(['Branch_ID', 'Branch_Name', 'Address'], 'Hospital')
         self.employee_form()
         self.doctor_form()
         self.nurse_form()
@@ -50,6 +57,8 @@ class Insert(ctk.CTkToplevel):
         self.assigned_nurse_form()
 
         # Layout
+        self.insert_frame.place(relx=0, rely=0, relwidth=0.45, relheight=1)
+        self.table_frame.place(relx=0.45, rely=0, relwidth=0.55, relheight=1)
         self.tabs.pack(expand=True, fill='both')
         self.employee_tabs.pack(expand=True, fill='both')
         self.emp_frame.pack(side='left', expand=True, fill='both')
@@ -90,7 +99,7 @@ class Insert(ctk.CTkToplevel):
         self.h_address_textbox = ctk.CTkTextbox(self.hospital, font=('Helvetica', 14), fg_color='#343638', height=100, width=370, border_color='#565b5e', border_width=2, activate_scrollbars=False)
 
         # Submit button
-        submit_button = ctk.CTkButton(self.hospital, text='Submit', command=lambda: self.commit_data('Hospital', ('Branch_ID', 'Branch_Name', 'Address'), (int(branch_id_var.get()), branch_name_var.get(), self.address_textbox.get('1.0', ctk.END))), fg_color='#144870', text_color='black', hover_color='cyan')
+        submit_button = ctk.CTkButton(self.hospital, text='Submit', command=lambda: self.commit_data('Hospital', ('Branch_ID', 'Branch_Name', 'Address'), (int(branch_id_var.get()), branch_name_var.get(), self.h_address_textbox.get('1.0', ctk.END))), fg_color='#144870', text_color='black', hover_color='cyan')
 
         # Layout
         branch_id_label.grid(column=0, row=0, sticky='e')
@@ -628,7 +637,63 @@ class Insert(ctk.CTkToplevel):
 
         cursor.execute(query, values)
         self.connection.commit()
-        self.after(1500, self.destroy)
+        # self.after(1500, self.destroy)
+        self.show_table(cols, table)
+
+    def choose_table(self):
+        if self.tabs.get() == 'Hospital':
+            self.show_table(['Branch_ID', 'Branch_Name', 'Address'], 'Hospital')
+        elif self.tabs.get() == 'Employee':
+            self.show_table(['Emp_ID', 'Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID'], 'Employee')
+
+        elif self.tabs.get() == 'Room':
+            self.show_table(['Room_no', 'Branch_ID', 'R_type', 'Capacity', 'Available'], 'Room')
+
+        elif self.tabs.get() == 'Patient':
+            self.show_table(['PID', 'P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no'], 'Patient')
+
+        elif self.tabs.get() == 'Patient Record':
+            self.show_table(['Record_no', 'PID', 'Treatment_Type', 'Date', 'Bill'], 'Patient_Records')
+
+        elif self.tabs.get() == 'Treatment':
+            self.show_table(['Emp_ID', 'PID', 'Date_Start', 'Date_end'], 'Treatment')
+
+        elif self.tabs.get() == 'Assigned Nurse':
+            self.show_table(['Emp_ID', 'PID', 'Shift'], 'Cares_for')
+
+    def show_table(self, cols, table):
+        self.table.delete(*self.table.get_children())
+        self.table.pack_forget()
+        style = ttk.Style()
+
+        # Configure the style for the Treeview widget
+        style.theme_use("clam")  # Change the theme to 'clam' (you can try other themes)
+        style.configure("Treeview",
+                        background="#c2c2c2",  # Background color
+                        foreground="black",    # Foreground color (text color)
+                        rowheight=25,          # Row height
+                        fieldbackground="#f0f0f0"  # Background color for fields
+                        )
+        style.map("Treeview",  # Map the Treeview widget with specific settings
+                background=[('selected', '#0078D7')],  # Selected item background color
+                foreground=[('selected', 'white')]    # Selected item text color
+                )
+        
+        self.table = ttk.Treeview(self.table_frame, columns=cols, show='headings', style='Treeview')
+
+        query = 'SELECT {} FROM {}'.format(', '.join(cols), table)
+
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        for col in cols:
+            self.table.heading(f'{col}', text=f'{col.title()}')
+
+        for row in results:
+            self.table.insert('', ctk.END, values=row)
+
+        self.table.pack(expand=True, fill='both')
 
     def change_size(self, event):
         center_x = int((self.winfo_screenwidth() - 700) / 2)
@@ -2247,7 +2312,7 @@ class Update(ctk.CTkToplevel):
 
        
         emp_id_combo = ctk.CTkComboBox(self.cares_for, values=emp_id_list, variable=emp_id_var, command=lambda e=None: self.enable_combo(patient_id_combo))
-        patient_id_combo = ctk.CTkComboBox(self.cares_for, values=patient_id_list, variable=patient_id_var, state='disabled', command=lambda e=None: self.populate_composite('Treatment', ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], cols, [date_start_var, date_end_var]))
+        patient_id_combo = ctk.CTkComboBox(self.cares_for, values=patient_id_list, variable=patient_id_var, state='disabled', command=lambda e=None: self.populate_composite('Cares_for', ['Emp_ID', 'PID'], [emp_id_var.get(), patient_id_var.get()], cols, shift_var))
         shift_combo = ctk.CTkComboBox(self.cares_for, values=['Morning', 'Evening'], variable=shift_var, state='readonly')
 
         # Update button

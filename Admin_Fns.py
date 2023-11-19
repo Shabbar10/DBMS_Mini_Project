@@ -1403,7 +1403,7 @@ class Delete(ctk.CTkToplevel):
 
     def create_widgets(self):
         self.del_frame = ctk.CTkFrame(self)
-        self.table_frame = ctk.CTkFrame(self)
+        self.table_frame = ctk.CTkScrollableFrame(self, orientation='horizontal')
         
         # Tabs
         self.tabs = ctk.CTkTabview(self.del_frame, command=lambda e=None: self.choose_table())
@@ -1820,7 +1820,7 @@ class Update(ctk.CTkToplevel):
 
     def create_widgets(self):
         self.update_frame = ctk.CTkFrame(self)
-        self.table_frame = ctk.CTkFrame(self)
+        self.table_frame = ctk.CTkScrollableFrame(self, orientation='horizontal')
 
         # Tabs
         self.tabs = ctk.CTkTabview(self.update_frame, command=lambda e=None: self.choose_table())
@@ -1845,8 +1845,8 @@ class Update(ctk.CTkToplevel):
         self.assigned_nurse_update()
 
         # Layout
-        self.update_frame.pack(expand=True, fill='both', side='left')
-        self.table_frame.pack(expand=True, fill='both', side='left')
+        self.update_frame.place(x=0, y=0, relwidth=0.4, relheight=1)
+        self.table_frame.place(relx=0.4, y=0, relwidth=0.6, relheight=1)
         self.tabs.pack(expand=True, fill='both')
 
     def employee_update(self):

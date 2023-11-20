@@ -692,44 +692,6 @@ class Insert(ctk.CTkToplevel):
 
         self.table.pack(expand=True, fill='both')
 
-    def change_size(self, event):
-        center_x = int((self.winfo_screenwidth() - 700) / 2)
-
-        if self.tabs.get() == 'Hospital':
-            center_y = int((self.winfo_screenheight() - 350) / 2)
-            print('Hospital')
-            self.geometry(f'700x350+{center_x}+{center_y}')
-
-        elif self.tabs.get() == 'Employee':
-            center_y = int((self.winfo_screenheight() - 650) / 2)
-            print('Employee')
-            self.geometry(f'700x650+{center_x}+{center_y}')
-
-        elif self.tabs.get() == 'Room':
-            center_y = int((self.winfo_screenheight() - 350) / 2)
-            print('Room')
-            self.geometry(f'700x350+{center_x}+{center_y}')
-
-        elif self.tabs.get() == 'Patient':
-            center_y = int((self.winfo_screenheight() - 450) / 2)
-            print('Patient')
-            self.geometry(f'700x450+{center_x}+{center_y}')
-        
-        elif self.tabs.get() == 'Patient Record':
-            center_y = int((self.winfo_screenheight() - 350) / 2)
-            print('Patient Records')
-            self.geometry(f'700x350+{center_x}+{center_y}')
-
-        elif self.tabs.get() == 'Treatment':
-            center_y = int((self.winfo_screenheight() - 350) / 2)
-            print('Hospital')
-            self.geometry(f'700x350+{center_x}+{center_y}')
-
-        elif self.tabs.get() == 'Assigned Nurse':
-            center_y = int((self.winfo_screenheight() - 350) / 2)
-            print('Hospital')
-            self.geometry(f'700x350+{center_x}+{center_y}')
-
     def not_null(self, submit, err_widget, label):
         input = err_widget.get()
         if  len(input) == 0:

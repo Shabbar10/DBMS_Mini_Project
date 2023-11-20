@@ -383,17 +383,15 @@ class Insert(ctk.CTkToplevel):
         # Entries
         p_name_entry = ctk.CTkEntry(self.patient, textvariable=p_name_var)
         dob_entry = ctk.CTkEntry(self.patient, textvariable=dob_var)
-        sex_entry = ctk.CTkEntry(self.patient, textvariable=sex_var)
         address_textbox = ctk.CTkTextbox(self.patient, font=('Helvetica', 14), fg_color='#343638', height=30, border_color='#565b5e', border_width=2, activate_scrollbars=False)
 
         # Comboboxes
         cursor = self.connection.cursor()
 
-        cursor.execute('SELECT Branch_ID, Room_no FROM Room GROUP BY Branch_ID, Room_no;')
+        cursor.execute('SELECT DISTINCT Branch_ID FROM Room')
         results = cursor.fetchall()
 
         branch_id_list = []
-        my_dict = {}
 
         for record in results:
             if str(record[0]) not in branch_id_list:
@@ -405,18 +403,17 @@ class Insert(ctk.CTkToplevel):
             room_no_list = []
             for s in stuff:
                 room_no_list.append(str(s[0]))
-                
-            my_dict[bid] = room_no_list
 
-        branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var, state = 'readonly')
+        branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var, state = 'readonly', command=lambda e=None: self.get_room_id(branch_id_var.get(), room_no_list, room_no_combo))
         room_no_combo = ctk.CTkComboBox(self.patient, values=room_no_list, variable=room_no_var, state = 'readonly')
+        sex_combo = ctk.CTkComboBox(self.patient, values=['M', 'F'], variable=sex_var)
 
         cursor.close()
 
         # Submit Button
         submit_button = ctk.CTkButton(self.patient, 
                                       text='Submit', 
-                                      command=lambda: self.commit_data('Patient', ('P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no'), (p_name_var.get(), dob_var.get()), sex_var.get(), address_textbox.get('1.0', ctk.END), int(branch_id_var.get()), int(room_no_var.get())), 
+                                      command=lambda e=None: self.commit_data('Patient', ('P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no'), (p_name_var.get(), dob_var.get(), sex_var.get(), address_textbox.get('1.0', ctk.END), int(branch_id_var.get()), int(room_no_var.get()))), 
                                       fg_color='#144870', 
                                       text_color='black', 
                                       hover_color='cyan')
@@ -437,7 +434,7 @@ class Insert(ctk.CTkToplevel):
 
         p_name_entry.grid(column=1, row=0, sticky='ew', padx=50)
         dob_entry.grid(column=1, row=1, sticky='ew', padx=50)
-        sex_entry.grid(column=1, row=2, sticky='ew', padx=50)
+        sex_combo.grid(column=1, row=2, sticky='ew', padx=50)
         address_textbox.grid(column=1, row=3, sticky='nsew', padx=50)
         branch_id_combo.grid(column=1, row=4, sticky='ew', padx=50)
         room_no_combo.grid(column=1, row=5, sticky='ew', padx=50)
@@ -791,23 +788,18 @@ class Insert(ctk.CTkToplevel):
                 result = self.cursor1.fetchall()
                 self.id_list = [str(i[0]) for i in result]
 
-    def get_room_id(self, b_id):
-        self.room_list.clear()
-        self.db_dict = {}
-        for i in self.id_list:
-            self.cursor1.execute('select Room_no from Room where Branch_ID = %s', (i))
-            self.r1  = self.cursor1.fetchall()
-            for room in self.r1:
-                self.db_dict.setdefault(str(i), []).append(str(room[0]))
+    def get_room_id(self, b_id, r_no_list, r_no_combo):
+        r_no_list.clear()
 
+        query = f'SELECT Room_no FROM Room WHERE Branch_ID = {b_id}'
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
 
-        for key in self.db_dict.keys():
-            for value in self.db_dict[key]:
-                if key == b_id:
-                    self.room_list.append(str(value))
+        for rno in results:
+            r_no_list.append(str(rno[0]))
 
-        self.room_no_var.set(value= self.room_list[0])
-        self.room_no_entry.configure(values = self.room_list, variable = self.room_no_var)        
+        r_no_combo.configure(values=r_no_list)
 
     def room_details(self, capacity, available, err_widget, err_label, submit):
        submit.configure(state = 'disabled')

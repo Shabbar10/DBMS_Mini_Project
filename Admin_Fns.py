@@ -331,7 +331,7 @@ class Insert(ctk.CTkToplevel):
         # Submit button
         submit_button = ctk.CTkButton(self.room, 
                                       text='Submit', 
-                                      command=lambda: self.commit_data('Room', ('Room_no', 'Branch_ID', 'R_Type', 'Capacity', 'Available'), (int(room_no_var.get()), int(branch_id_var.get())), room_type_var.get(), int(capactiy_var.get()), int(available_var.get())), 
+                                      command=lambda: self.commit_data('Room', ('Room_no', 'Branch_ID', 'R_Type', 'Capacity', 'Available'), (int(room_no_var.get()), int(branch_id_var.get()), room_type_var.get(), int(capactiy_var.get()), int(available_var.get()))),
                                       fg_color='#144870', 
                                       text_color='black', 
                                       hover_color='cyan')
@@ -392,17 +392,18 @@ class Insert(ctk.CTkToplevel):
         results = cursor.fetchall()
 
         branch_id_list = []
+        room_no_list = []
 
         for record in results:
             if str(record[0]) not in branch_id_list:
                 branch_id_list.append(str(record[0]))
 
-        for bid in branch_id_list:
-            cursor.execute(f'SELECT Room_no FROM Room WHERE Branch_ID = {bid}')
-            stuff = cursor.fetchall()
-            room_no_list = []
-            for s in stuff:
-                room_no_list.append(str(s[0]))
+        # for bid in branch_id_list:
+        #     cursor.execute(f'SELECT Room_no FROM Room WHERE Branch_ID = {bid}')
+        #     stuff = cursor.fetchall()
+        #     room_no_list = []
+        #     for s in stuff:
+        #         room_no_list.append(str(s[0]))
 
         branch_id_combo = ctk.CTkComboBox(self.patient, values=branch_id_list, variable=branch_id_var, state = 'readonly', command=lambda e=None: self.get_room_id(branch_id_var.get(), room_no_list, room_no_combo))
         room_no_combo = ctk.CTkComboBox(self.patient, values=room_no_list, variable=room_no_var, state = 'readonly')
@@ -1435,7 +1436,10 @@ class Delete(ctk.CTkToplevel):
 
         self.table = ttk.Treeview(self.table_frame)
 
+        self.error_img = ctk.CTkImage(Image.open('error.png'))
+        self.done_img = ctk.CTkImage(Image.open('done.png'))
         self.employee_delete()
+
         self.show_table(['Emp_ID', 'Emp_Name', 'Salary', 'DOJ', 'MGR_ID', 'Branch_ID'], 'Employee')
         self.room_delete()
         self.patient_delete()
@@ -1624,7 +1628,7 @@ class Delete(ctk.CTkToplevel):
             patient_id_list.append(str(pid[0]))
 
         doc_id_combo = ctk.CTkComboBox(self.treatment, values=self.doc_id_list, variable=doc_id_var, state = 'readonly')
-        patient_id_combo = ctk.CTkComboBox(self.treatment, values=patient_id_list, variable=patient_id_var, command= lambda : self.get_doc_id(patient_id_var.get()), state = 'readonly')
+        patient_id_combo = ctk.CTkComboBox(self.treatment, values=patient_id_list, variable=patient_id_var, command= lambda e=None: self.get_doc_id(patient_id_var.get()), state = 'readonly')
 
         # Delete button
         del_button = ctk.CTkButton(self.treatment, text='Delete', command=lambda: self.delete_record('Treatment', ['Emp_ID', 'PID', 'Date_Start', 'Date_end'], f'Emp_ID = {doc_id_var.get()} AND PID = {patient_id_var.get()}'))
@@ -1778,6 +1782,13 @@ class Delete(ctk.CTkToplevel):
 
         self.id_list.clear()
         self.get_branch_id()
+
+    def get_branch_id(self):
+            self.id_list.clear()
+            self.cursor1 = self.connection.cursor()
+            self.cursor1.execute('select distinct Branch_ID from Room')
+            result = self.cursor1.fetchall()
+            self.id_list = [str(i[0]) for i in result]
 
     def get_room_id(self, b_id, combo_widget):
         self.room_no_list.clear()
@@ -1999,7 +2010,7 @@ class Update(ctk.CTkToplevel):
         available_entry = ctk.CTkEntry(self.room, textvariable=available_var)
 
         # Update button
-        update_button = ctk.CTkButton(self.room, text='Update', command=lambda e=None: self.update_record_composite('Room', cols, [room_type_var.get(), capacity_var.get(), available_var.get()], ['Branch_ID', 'Room_no'], [branch_id_var.get(), room_no_var.get()]))
+        update_button = ctk.CTkButton(self.room, text='Update', command=lambda e=None: self.update_record_composite('Room', cols, [room_type_var.get(), capacity_var.get(), available_var.get()], ['Branch_ID', 'Room_no'], [branch_id_var.get(), room_no_var.get()], error_label))
 
         # Layout
         branch_id_label.grid(column=0, row=0, columnspan=2)
@@ -2162,6 +2173,7 @@ class Update(ctk.CTkToplevel):
         bill_label.grid(column=2, row=2)
         error_label.grid(column=1, row=3, columnspan=2)
 
+        patient_id_combo.grid(column=1, row=1, sticky='ew', padx=50)
         treatment_type_entry.grid(column=3, row=1, sticky='ew', padx=50)
         date_entry.grid(column=1, row=2, sticky='ew', padx=50)
         bill_entry.grid(column=3, row=2, sticky='ew', padx=50)
@@ -2458,4 +2470,3 @@ class Update(ctk.CTkToplevel):
                 err_label.configure(text = " ",text_color = 'red', image = self.done_img, compound = 'left' )
                 submit.configure(state = 'normal')
                 return True
-            

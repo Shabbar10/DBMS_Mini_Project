@@ -24,10 +24,10 @@ class App(ctk.CTkToplevel):
         self.title('Hospital Management System')
         self.minsize(dimensions[0], dimensions[1])
 
-        if user == 'root':
+        if user == 'admin':
             self.left_frame = Left_Admin_Frame(self)
             right_frame = Right_Admin_Frame(self, self.connection)
-        elif user == 'guest':
+        else:
             self.left_frame = Left_User_Frame(self)
             right_frame = Right_User_Frame(self, self.connection)
 
@@ -402,4 +402,3 @@ class Right_Admin_Frame(Right_Frame):
         self.view_button.configure(command=lambda: af.View(connection))
         self.delete_button.configure(command=lambda: af.Delete(connection))
         self.update_button.configure(command=lambda: af.Update(connection))
-        

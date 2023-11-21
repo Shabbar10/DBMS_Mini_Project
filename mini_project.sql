@@ -2,7 +2,7 @@ CREATE DATABASE HospitalMS;
 
 USE HospitalMS;
 
-DROP DATABASE hospitalms;
+-- DROP DATABASE hospitalms;
 
 -- Hospital Table(Strong)
 CREATE TABLE Hospital(Branch_ID INT PRIMARY KEY,
@@ -43,7 +43,7 @@ BEGIN
 END //
 DELIMITER ;
 
-DROP TABLE Employee;
+-- DROP TABLE Employee;
 
 DELIMITER //
 CREATE TRIGGER SetNullMGR_ID
@@ -51,9 +51,11 @@ BEFORE UPDATE ON Employee
 FOR EACH ROW
 BEGIN
 	-- check if Employee name is not null
-	SET NEW.MGR_ID = NULLIF(NEW.MGR_ID, 'None');
+	SET NEW.MGR_ID = NULLIF(NEW.MGR_ID, '0');
 END //
 DELIMITER ;
+
+DROP TRIGGER SetNullMGR_ID;
 
 -- trigger for Branch_ID not null constraint
 DELIMITER //
@@ -325,7 +327,7 @@ INSERT INTO Employee(Emp_Name, Salary, DOJ, MGR_ID, Branch_ID) VALUES('Kyoka', 1
 
 SELECT * FROM Employee;
 
-UPDATE Employee SET MGR_ID = 1111 WHERE Emp_ID = 1115;
+UPDATE Employee SET MGR_ID = 0 WHERE Emp_ID = 1115;
 UPDATE Employee SET MGR_ID = 1112 WHERE Emp_ID = 1116;
 UPDATE Employee SET MGR_ID = 1113 WHERE Emp_ID = 1117;
 UPDATE Employee SET MGR_ID = 1114 WHERE Emp_ID = 1118;

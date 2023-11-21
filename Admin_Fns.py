@@ -1548,7 +1548,7 @@ class Delete(ctk.CTkToplevel):
 
         # Combobox
         cursor = self.connection.cursor()
-        cursor.execute('SELECT Room_no FROM Room')
+        cursor.execute('SELECT PID FROM Patient')
         results = cursor.fetchall()
         patient_id_list = []
 
@@ -2380,11 +2380,12 @@ class Update(ctk.CTkToplevel):
 
     def update_record(self, table, col_list, val_list, pk, pk_val, err_label):
         try:
-            pairs = ' , '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
+            pairs = ', '.join(["{}='{}'".format(col, val) for col, val in zip(col_list, val_list)])
             query = 'UPDATE {} SET {} WHERE {} = {}'.format(table, pairs, pk, pk_val)
 
             self.cursor.execute(query)
-        except Exception :
+        except Exception as e:
+               print(e)
                err_label.configure(text = ' ERROR', text_color = 'red', image = self.error_img, compound = 'left')
         else:
                 self.connection.commit()
@@ -2420,7 +2421,7 @@ class Update(ctk.CTkToplevel):
         except ValueError:
             err_widget.configure(border_color = 'red')
             err_label.configure(text = ' Invalid Date Format\n Valid Format : yyyy/mm/dd', text_color = 'red', image = self.error_img, compound = 'left')
-            submit.configure(state='disabled')
+            # submit.configure(state='disabled')
             return False
     
         else:
@@ -2434,13 +2435,13 @@ class Update(ctk.CTkToplevel):
         if  len(input) == 0:
             err_widget.configure(border_color = 'red')
             label.configure(text=' Name cannot be empty', text_color = 'red', image = self.error_img, compound = 'left')
-            submit.configure(state = 'disabled')
+            # submit.configure(state = 'disabled')
             return False
         
         elif input.isdigit():
             err_widget.configure(border_color = 'red')
             label.configure(text=' Name cannot be a number ', text_color = 'red', image = self.error_img, compound = 'left')
-            submit.configure(state = 'disabled')
+            # submit.configure(state = 'disabled')
 
             return False
         else:
@@ -2454,7 +2455,7 @@ class Update(ctk.CTkToplevel):
         if (self.validate_date(date, err_widget, err_label, submit)):
 
             err_widget.configure(border_color = 'green')
-            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+            err_label.configure(text = ' ', text_color = 'green', image = self.done_img, compound = 'left')
             submit.configure(state='normal')
 
             date_enter = datetime.strptime(date, "%Y-%m-%d")    
@@ -2468,6 +2469,6 @@ class Update(ctk.CTkToplevel):
                 return False
             else:
                 err_widget.configure(border_color = 'green')
-                err_label.configure(text = " ",text_color = 'red', image = self.done_img, compound = 'left' )
+                err_label.configure(text = " ",text_color = 'green', image = self.done_img, compound = 'left' )
                 submit.configure(state = 'normal')
                 return True

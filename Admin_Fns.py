@@ -1334,13 +1334,14 @@ class View(ctk.CTkToplevel):
             if var != '':
                 yes_count += 1
 
+        temp = yes_count
         # cols = ''
         cols = []
 
         index = 0
-        while yes_count > 0:
+        while temp > 0:
             if var_list[index] != '':
-                yes_count -= 1
+                temp -= 1
                 cols.append(var_list[index])
             index += 1
 

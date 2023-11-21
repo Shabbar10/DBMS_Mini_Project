@@ -24,7 +24,7 @@ class App(ctk.CTkToplevel):
         self.title('Hospital Management System')
         self.minsize(dimensions[0], dimensions[1])
 
-        if user == 'admin':
+        if user == 'root':
             self.left_frame = Left_Admin_Frame(self)
             right_frame = Right_Admin_Frame(self, self.connection)
         else:

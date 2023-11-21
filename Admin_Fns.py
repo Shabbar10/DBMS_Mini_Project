@@ -309,8 +309,8 @@ class Insert(ctk.CTkToplevel):
         err_label = ctk.CTkLabel(self.room, text='', font=('Helvetica', 14), text_color='red')
 
         # Entries
-        self.r_room_no_entry = ctk.CTkEntry(self.room)
-        self.r_room_type_entry = ctk.CTkEntry(self.room)
+        self.r_room_no_entry = ctk.CTkEntry(self.room, textvariable=room_no_var)
+        self.r_room_type_entry = ctk.CTkEntry(self.room, textvariable=room_type_var)
         self.r_capactiy_entry = ctk.CTkEntry(self.room, textvariable= capactiy_var)
         self.r_available_entry = ctk.CTkEntry(self.room, textvariable= available_var)
 

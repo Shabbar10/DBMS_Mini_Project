@@ -52,8 +52,8 @@ class frame(ctk.CTkFrame):
         pwd_label = ctk.CTkLabel(self, text='  Password', text_color='white', font=("Helvetica", 14), image= self.pwd_img, compound= 'left')
 
         # Entry widgets
-        self.username_var = ctk.StringVar(value='mysql')
-        self.pwd_var = ctk.StringVar(value='')
+        self.username_var = ctk.StringVar(value='root')
+        self.pwd_var = ctk.StringVar(value='rootadmin@24(')
 
         self.username_entry = ctk.CTkEntry(self,
                                            placeholder_text="username", 

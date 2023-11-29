@@ -14,8 +14,8 @@ class login_window(ctk.CTk):
 
         self.geometry(f'{width}x{height}+{center_x}+{center_y}')
         self.main_container = canva(self)
-        # self.overrideredirect(True)
-        # self.attributes('-topmost', True)
+        self.overrideredirect(True)
+        self.attributes('-topmost', True)
         self.grab_set()
 
 
@@ -52,8 +52,8 @@ class frame(ctk.CTkFrame):
         pwd_label = ctk.CTkLabel(self, text='  Password', text_color='white', font=("Helvetica", 14), image= self.pwd_img, compound= 'left')
 
         # Entry widgets
-        self.username_var = ctk.StringVar(value='root')
-        self.pwd_var = ctk.StringVar(value='rootadmin@24(')
+        self.username_var = ctk.StringVar()
+        self.pwd_var = ctk.StringVar()
 
         self.username_entry = ctk.CTkEntry(self,
                                            placeholder_text="username", 

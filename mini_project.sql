@@ -2,7 +2,7 @@ CREATE DATABASE HospitalMS;
 
 USE HospitalMS;
 
--- DROP DATABASE hospitalms;
+DROP DATABASE hospitalms;
 
 -- Hospital Table(Strong)
 CREATE TABLE Hospital(Branch_ID INT PRIMARY KEY,
@@ -43,7 +43,14 @@ BEGIN
 END //
 DELIMITER ;
 
--- DROP TABLE Employee;
+SELECT * FROM Employee;
+SELECT * FROM Doctor;
+SELECT * FROM Room;
+SELECT * FROM Patient;
+DELETE FROM PATIENT WHERE PID = 1;
+UPDATE Room SET Available = 10 WHERE Branch_ID = 1182 AND Room_no = 201;
+
+UPDATE Employee SET MGR_ID = 0 WHERE Emp_ID = 1111;
 
 DELIMITER //
 CREATE TRIGGER SetNullMGR_ID
@@ -51,7 +58,7 @@ BEFORE UPDATE ON Employee
 FOR EACH ROW
 BEGIN
 	-- check if Employee name is not null
-	SET NEW.MGR_ID = NULLIF(NEW.MGR_ID, '0');
+	SET NEW.MGR_ID = NULLIF(NEW.MGR_ID, 0);
 END //
 DELIMITER ;
 
@@ -120,11 +127,11 @@ DELIMITER ;
 -- Room Table (weak)
 CREATE TABLE Room(Room_no INT,
 				  Branch_ID INT,
-				  FOREIGN KEY(Branch_ID) REFERENCES Hospital(Branch_ID) ON DELETE CASCADE,	
+					FOREIGN KEY(Branch_ID) REFERENCES Hospital(Branch_ID) ON DELETE CASCADE,	
 				  R_Type VARCHAR(25),
                   Capacity INT CHECK(Capacity > 0),
                   Available INT,
-                  PRIMARY KEY(Branch_ID, Room_no));
+					PRIMARY KEY(Branch_ID, Room_no));
            
 -- trigger for room availability < capacity constraint
 DELIMITER //
@@ -139,7 +146,7 @@ BEGIN
 END //
 DELIMITER ;
 
-
+SELECT * FROM Patient;
           
 -- Patient Table (strong)
 CREATE TABLE Patient(PID INT PRIMARY KEY auto_increment,
@@ -149,8 +156,9 @@ CREATE TABLE Patient(PID INT PRIMARY KEY auto_increment,
                      Address VARCHAR(255),
                      Branch_ID INT NOT NULL,
                      Room_no INT NOT NULL,
-					 FOREIGN KEY(Branch_ID, Room_no) REFERENCES Room(Branch_ID, Room_no) ON DELETE CASCADE);
+						FOREIGN KEY(Branch_ID, Room_no) REFERENCES Room(Branch_ID, Room_no) ON DELETE CASCADE);
 					
+SELECT * FROM Room;
 
 -- -- trigger for P_name not null constraint
 DELIMITER //
@@ -188,7 +196,7 @@ DELIMITER ;
 -- Patient_Records Table (strong)
 CREATE TABLE Patient_Records(Record_no INT PRIMARY KEY AUTO_INCREMENT,
 							 PID INT NOT NULL,
-                             FOREIGN KEY(PID)REFERENCES Patient(PID) ON DELETE NO ACTION,
+								FOREIGN KEY(PID)REFERENCES Patient(PID) ON DELETE NO ACTION,
                              Treatment_Type VARCHAR(50),
                              Date DATE,
                              Bill INT CHECK(Bill>0));
@@ -208,12 +216,12 @@ DELIMITER ;
               
 -- associative
 CREATE TABLE Treatment(Emp_Id INT,
-					   FOREIGN KEY(Emp_ID) REFERENCES Doctor(Emp_ID) ON DELETE CASCADE,
+						FOREIGN KEY(Emp_ID) REFERENCES Doctor(Emp_ID) ON DELETE CASCADE,
                        PID INT,
-					   FOREIGN KEY(PID) REFERENCES Patient(PID) ON DELETE CASCADE,
+						FOREIGN KEY(PID) REFERENCES Patient(PID) ON DELETE CASCADE,
                        Date_Start DATE,
                        Date_end DATE,
-                       PRIMARY KEY(Emp_ID, PID));
+						PRIMARY KEY(Emp_ID, PID));
                                    
 -- associative
 CREATE TABLE Cares_for(Emp_ID INT,
@@ -327,7 +335,7 @@ INSERT INTO Employee(Emp_Name, Salary, DOJ, MGR_ID, Branch_ID) VALUES('Kyoka', 1
 
 SELECT * FROM Employee;
 
-UPDATE Employee SET MGR_ID = 0 WHERE Emp_ID = 1115;
+UPDATE Employee SET MGR_ID = 1111 WHERE Emp_ID = 1115;
 UPDATE Employee SET MGR_ID = 1112 WHERE Emp_ID = 1116;
 UPDATE Employee SET MGR_ID = 1113 WHERE Emp_ID = 1117;
 UPDATE Employee SET MGR_ID = 1114 WHERE Emp_ID = 1118;

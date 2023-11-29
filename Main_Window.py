@@ -27,7 +27,7 @@ class App(ctk.CTkToplevel):
         if user == 'root':
             self.left_frame = Left_Admin_Frame(self)
             right_frame = Right_Admin_Frame(self, self.connection)
-        elif user == 'guest':
+        else:
             self.left_frame = Left_User_Frame(self)
             right_frame = Right_User_Frame(self, self.connection)
 
@@ -39,7 +39,7 @@ class Left_Frame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, fg_color='#0f0f0f')
         self.create_widgets()
-        # self.play_music()
+        self.play_music()
     
     def create_widgets(self):
         self.mute_image = ctk.CTkImage(Image.open('mute1.png'), size=(18,18))
@@ -64,7 +64,7 @@ class Left_Frame(ctk.CTkFrame):
 
     def play_music(self):
         pygame.mixer.init()
-        pygame.mixer.music.load("Gogeta.mp3")
+        pygame.mixer.music.load("Undertaker.mp3")
         pygame.mixer.music.play(-1) # Loop indefinitely
 
     # def stop_music(self):
@@ -103,7 +103,7 @@ class Left_Admin_Frame(Left_Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.profile_pic = ctk.CTkImage(Image.open('Saurab.png'), size=(500,498))
+        self.profile_pic = ctk.CTkImage(Image.open('ACD293.png'), size=(500,498))
         self.profile_label = ctk.CTkLabel(self, image=self.profile_pic, text='')
 
         self.admin_img = ctk.CTkImage(Image.open('admin.png'))
@@ -235,8 +235,8 @@ class Right_User_Frame(Right_Frame):
         # Submit Button
         self.submit_button = ctk.CTkButton(frame, text='Submit', command=self.commit_data, fg_color='#144870', text_color='black', hover_color='cyan')
 
-        self.gender_list = ['M', 'F']
         # Textvariables
+        self.gender_list = ['M', 'F']
         self.p_name_var = ctk.StringVar()
         self.dob_var = ctk.StringVar(value='yyyy-mm-dd')
         self.sex_var = ctk.StringVar(value= self.gender_list[0] )
@@ -245,19 +245,17 @@ class Right_User_Frame(Right_Frame):
         self.room_no_var = ctk.StringVar()
 
         # Entries
+
         self.p_name_entry = ctk.CTkEntry(frame, textvariable=self.p_name_var, validatecommand = self.not_null, validate = "focus")
         self.dob_entry = ctk.CTkEntry(frame, textvariable=self.dob_var)
         self.sex_entry = ctk.CTkComboBox(frame, values= self.gender_list, variable=self.sex_var, state='readonly')
         self.address_textbox = ctk.CTkTextbox(frame, font=('Helvetica', 14), fg_color='#343638', height=30, border_color='#565b5e', border_width=2, activate_scrollbars=False)
-        # self.branch_id_entry = ctk.CTkEntry(frame, textvariable=self.branch_id_var)
-         
         self.branch_id_entry = ctk.CTkComboBox(frame, values= self.id_list, variable= self.branch_id_var, state= 'readonly', command= lambda x : self.get_room_id(self.branch_id_var.get()))
-
         self.room_no_entry = ctk.CTkComboBox(frame, values= self.room_list, variable=self.room_no_var, state = 'readonly')
 
 
         self.dob_entry.configure(validatecommand = lambda : self.validate_dob(self.dob_var.get(),self.dob_entry,self.error_label,
-                                                                                                                     self.submit_button), validate = "focusout")
+                                                                                                                     self.submit_button), validate = "focus")
         # Layout
                                                                                                                      
         self.p_name_label.grid(column=0, row=0, sticky='e')
@@ -279,8 +277,7 @@ class Right_User_Frame(Right_Frame):
         self.submit_button.grid(column=0, row=7, columnspan=2)
 
         # Event
-        self.dob_entry.bind('<Button-1>', lambda e: self.dob_entry.delete(0, ctk.END))
-
+        # self.dob_entry.bind('<Button-1>', lambda e: self.dob_entry.delete(0, ctk.END))
     
     def get_room_id(self, b_id):
         self.room_list.clear()
@@ -357,7 +354,6 @@ class Right_User_Frame(Right_Frame):
             if input_date != datetime.strptime(input_date, "%Y-%m-%d").strftime('%Y-%m-%d'):
                 raise ValueError
           
-            
         except ValueError:
             err_widget.configure(border_color = 'red')
             err_label.configure(text = ' Invalid Date Format\n Valid Format : yyyy/mm/dd', text_color = 'red', image = self.error_img, compound = 'left')
@@ -365,11 +361,10 @@ class Right_User_Frame(Right_Frame):
         
         else:
             err_widget.configure(border_color = 'green')
-            err_label.configure(text = ' ', text_color = 'red', image = self.done_img, compound = 'left')
+            err_label.configure(text = '', text_color = 'red', image = self.done_img, compound = 'left')
             submit.configure(state='normal')
             return True
-
-    
+  
     def validate_dob(self, date, err_widget, err_label, submit):
 
         if (self.validate_date(date, err_widget, err_label, submit)):
@@ -392,7 +387,9 @@ class Right_User_Frame(Right_Frame):
                 err_label.configure(text = " ",text_color = 'red', image = self.done_img, compound = 'left' )
                 submit.configure(state = 'normal')
                 return True
-        
+        else:
+            print('Hi')
+    
 
 class Right_Admin_Frame(Right_Frame):
     def __init__(self, parent, connection):
@@ -402,4 +399,3 @@ class Right_Admin_Frame(Right_Frame):
         self.view_button.configure(command=lambda: af.View(connection))
         self.delete_button.configure(command=lambda: af.Delete(connection))
         self.update_button.configure(command=lambda: af.Update(connection))
-        

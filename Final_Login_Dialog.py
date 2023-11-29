@@ -16,6 +16,8 @@ class login_window(ctk.CTk):
         self.main_container = canva(self)
         self.overrideredirect(True)
         self.attributes('-topmost', True)
+        self.grab_set()
+
 
         self.bind('<Escape>', lambda e: self.destroy())
         self.bind('<Button-1>', lambda e: self.deanimate_all(e))
@@ -50,8 +52,8 @@ class frame(ctk.CTkFrame):
         pwd_label = ctk.CTkLabel(self, text='  Password', text_color='white', font=("Helvetica", 14), image= self.pwd_img, compound= 'left')
 
         # Entry widgets
-        self.username_var = ctk.StringVar(value='root')
-        self.pwd_var = ctk.StringVar(value='root')
+        self.username_var = ctk.StringVar()
+        self.pwd_var = ctk.StringVar()
 
         self.username_entry = ctk.CTkEntry(self,
                                            placeholder_text="username", 
@@ -162,7 +164,7 @@ class frame(ctk.CTkFrame):
 
         self.logout_button.place(x = 5, rely=0.98, anchor='sw')
 
-        self.mainwindow.protocol("WM_DELETE_WINDOW", lambda e=None: self.close(e))
+        self.mainwindow.protocol("WM_DELETE_WINDOW", lambda e=None: self.close())
 
     def reopen(self, event):
         self.mainwindow.destroy()
@@ -171,7 +173,7 @@ class frame(ctk.CTkFrame):
         self.pswd_entry.delete(0, ctk.END)
         self.error.configure(text='')
 
-    def close(self, event):
+    def close(self):
         self.connection.close()
         home.destroy()
         

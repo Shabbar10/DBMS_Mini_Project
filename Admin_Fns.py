@@ -635,7 +635,7 @@ class Insert(ctk.CTkToplevel):
 
         cursor.execute(query, values)
         self.connection.commit()
-        # self.after(1500, self.destroy)
+        self.after(1500, self.destroy)
         self.show_table(cols, table)
 
     def choose_table(self):
@@ -1418,7 +1418,7 @@ class Delete(ctk.CTkToplevel):
         center_y = int((self.winfo_screenheight() - 500) / 2)
 
         self.geometry(f'1366x500+{center_x}+{center_y}')
-        self.title('Admin View')
+        self.title('Admin Delete')
         self.grab_set()
         self.create_widgets()
 
@@ -1558,7 +1558,7 @@ class Delete(ctk.CTkToplevel):
         patient_id_combo = ctk.CTkComboBox(self.patient, values=patient_id_list, variable=patient_id_var, state = 'readonly')
 
         # Delete button
-        del_button = ctk.CTkButton(self.patient, text='Delete', command=lambda: self.delete_record('Room', ['PID', 'P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no'], f'Room_no = {patient_id_var.get()}'))
+        del_button = ctk.CTkButton(self.patient, text='Delete', command=lambda: self.delete_record('Patient', ['PID', 'P_Name', 'DOB', 'Sex', 'Address', 'Branch_ID', 'Room_no'], f'PID = {patient_id_var.get()}'))
 
         # Layout
         patient_id_label.grid(column=0, row=0, sticky='e')
@@ -1614,12 +1614,12 @@ class Delete(ctk.CTkToplevel):
 
         # Combobox
         cursor = self.connection.cursor()
-        # cursor.execute('SELECT Emp_ID FROM Treatment')
-        # results = cursor.fetchall()
+        cursor.execute('SELECT Emp_ID FROM Doctor')
+        results = cursor.fetchall()
         self.doc_id_list = []
 
-        # for did in results:
-        #     self.doc_id_list.append(str(did[0]))
+        for did in results:
+            self.doc_id_list.append(str(did[0]))
 
         cursor.execute('SELECT PID FROM Treatment')
         results = cursor.fetchall()
